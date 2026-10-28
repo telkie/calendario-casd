@@ -210,6 +210,19 @@
   .tarefa-card .meta-t{font-size:11px; color:var(--text-faint); margin-top:2px}
   .ponto.arrastando{opacity:.35}
 
+  .escala-card{border:1px solid var(--border); border-radius:10px; padding:9px 10px; background:var(--surface-2); margin-bottom:8px}
+  .escala-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; font-size:12.5px}
+  .escala-head a{font-size:11px; color:var(--text-dim); text-decoration:none; white-space:nowrap}
+  .escala-head a:hover{color:var(--text)}
+  .escala-linha{font-size:12px; color:var(--text-dim); line-height:1.5; padding:4px 0; border-top:1px solid var(--border)}
+  .escala-linha:first-child{border-top:none; padding-top:0}
+  .escala-linha strong{color:var(--text)}
+  .tabela-escala{width:100%; border-collapse:collapse; font-size:12px}
+  .tabela-escala td{padding:3px 6px 3px 0; border-top:1px solid var(--border); color:var(--text-dim); vertical-align:top}
+  .tabela-escala tr:first-child td{border-top:none}
+  .tabela-escala td:first-child{white-space:nowrap; color:var(--text-faint)}
+  .escala-vazio{font-size:11.5px; color:var(--text-faint); padding:2px 0}
+
   /* ---------- zoom de mês ---------- */
   .zoom-cabecalho{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:18px 0 12px}
   .zoom-cabecalho h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
@@ -516,6 +529,231 @@ const HOJE = '2026-09-18';
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const DOW_PT = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
 const DOW_KEY = ['seg','ter','qua','qui','sex','sab','dom'];
+
+/* ================= escalas externas (planilhas do Google Sheets) =================
+   Cada planilha é mantida à mão pelo CASD, com formatação própria e irregular —
+   por isso cada uma tem seu extrator dedicado (mexer com cuidado se a planilha
+   mudar de layout; o sintoma de quebra é a seção simplesmente não aparecer mais
+   pro dia em questão, sem erro visível pro usuário). */
+
+function parseCSV(texto){
+  const linhas = [];
+  let linha = [], campo = '', entreAspas = false;
+  for(let i=0; i<texto.length; i++){
+    const c = texto[i];
+    if(entreAspas){
+      if(c === '"'){
+        if(texto[i+1] === '"'){ campo += '"'; i++; }
+        else entreAspas = false;
+      } else campo += c;
+    } else {
+      if(c === '"') entreAspas = true;
+      else if(c === ','){ linha.push(campo); campo=''; }
+      else if(c === '\n'){ linha.push(campo); linhas.push(linha); linha=[]; campo=''; }
+      else if(c === '\r'){ /* ignora */ }
+      else campo += c;
+    }
+  }
+  if(campo.length || linha.length){ linha.push(campo); linhas.push(linha); }
+  return linhas;
+}
+
+function extrairMembroDia(rows){
+  const PAPEIS = ['Diretor','Membro','Membro','Membro','Membro','Diretor','Membro','Membro'];
+  const mapa = new Map();
+  function addBloco(row, colTurno, colData, colNomesBase, colTag){
+    const turno = (row[colTurno]||'').trim();
+    const data = (row[colData]||'').trim();
+    if(!turno || !/^\d{1,2}\/\d{1,2}$/.test(data)) return;
+    const diretores = [], membros = [];
+    PAPEIS.forEach((papel, i)=>{
+      const nome = (row[colNomesBase+i]||'').trim();
+      if(!nome) return;
+      (papel==='Diretor'?diretores:membros).push(nome);
+    });
+    if(!diretores.length && !membros.length) return;
+    const tag = (row[colTag]||'').trim();
+    const lista = mapa.get(data) || [];
+    lista.push({turno, diretores, membros, tag});
+    mapa.set(data, lista);
+  }
+  rows.forEach(row=>{
+    addBloco(row, 1, 2, 3, 12);
+    addBloco(row, 18, 19, 20, 29);
+  });
+  return mapa;
+}
+
+function extrairVestExtensivo(rows){
+  const mapa = new Map();
+  const colsEsq = [2,3,4,5,6], colsDir = [9,10,11,12,13];
+  function vazio(row, cols){ return cols.every(c => !((row[c]||'').trim())); }
+  let i = 0;
+  while(i < rows.length){
+    const row = rows[i] || [];
+    const temSemana = /^semana/i.test((row[2]||'').trim()) || /^semana/i.test((row[9]||'').trim());
+    if(!temSemana){ i++; continue; }
+    const datesRow = rows[i+2] || [];
+    const datasEsq = colsEsq.map(c=> (datesRow[c]||'').trim());
+    const datasDir = colsDir.map(c=> (datesRow[c]||'').trim());
+    let j = i+3, periodo = 1;
+    while(j+1 < rows.length){
+      const profRow = rows[j], matRow = rows[j+1];
+      if(!profRow || vazio(profRow, colsEsq.concat(colsDir))) break;
+      if(/^semana/i.test((profRow[2]||'').trim()) || /^semana/i.test((profRow[9]||'').trim())) break;
+      colsEsq.forEach((c,idx)=>{
+        const prof = (profRow[c]||'').trim();
+        const data = datasEsq[idx];
+        if(!prof || !/^\d{1,2}\/\d{1,2}$/.test(data)) return;
+        const lista = mapa.get(data) || [];
+        lista.push({periodo, professor: prof, materia: (matRow[c]||'').trim()});
+        mapa.set(data, lista);
+      });
+      colsDir.forEach((c,idx)=>{
+        const prof = (profRow[c]||'').trim();
+        const data = datasDir[idx];
+        if(!prof || !/^\d{1,2}\/\d{1,2}$/.test(data)) return;
+        const lista = mapa.get(data) || [];
+        lista.push({periodo, professor: prof, materia: (matRow[c]||'').trim()});
+        mapa.set(data, lista);
+      });
+      periodo++;
+      j += 2;
+    }
+    i = j;
+  }
+  return mapa;
+}
+
+function extrairVestSemi(rows){
+  const cols = [2,3,4,5,6];
+  const mapa = new Map();
+  const headerIdx = rows.findIndex(r => (r[2]||'').trim().toUpperCase() === 'SEGUNDA');
+  if(headerIdx < 0) return mapa;
+  let i = headerIdx + 1;
+  while(i+1 < rows.length){
+    const profRow = rows[i] || [], matRow = rows[i+1] || [];
+    const hora = (profRow[1]||'').trim();
+    if(!hora && cols.every(c=>!((profRow[c]||'').trim()))) break;
+    cols.forEach((c, idx)=>{
+      const prof = (profRow[c]||'').trim();
+      if(!prof) return;
+      const lista = mapa.get(idx) || [];
+      lista.push({hora, professor: prof, materia: (matRow[c]||'').trim()});
+      mapa.set(idx, lista);
+    });
+    i += 2;
+  }
+  return mapa;
+}
+
+function extrairInhoExtensivo(rows){
+  const colsSala = [3,5,7,9];
+  const mapa = new Map();
+  let salas = [], dataAtual = null;
+  for(let i=0; i<rows.length; i++){
+    const row = rows[i] || [];
+    const col1 = (row[1]||'').trim();
+    const mDia = col1.match(/^DIA\s+(\d{1,2}\/\d{1,2})/i);
+    if(mDia){
+      dataAtual = mDia[1];
+      const salasRow = rows[i+1] || [];
+      salas = colsSala.map(c=> (salasRow[c]||'').trim());
+      continue;
+    }
+    if(!dataAtual) continue;
+    const hora = (row[2]||'').trim();
+    if(!hora) continue;
+    const turno = col1 || null;
+    const valores = colsSala.map(c=> (row[c]||'').trim());
+    if(valores.some(v=>/^intervalo$/i.test(v))){
+      const lista = mapa.get(dataAtual) || [];
+      lista.push({turno, hora, intervalo:true});
+      mapa.set(dataAtual, lista);
+      continue;
+    }
+    if(valores.every(v=>!v)) continue;
+    const lista = mapa.get(dataAtual) || [];
+    lista.push({turno, hora, salas: salas.map((nome,idx)=>({nome, valor: valores[idx]||''}))});
+    mapa.set(dataAtual, lista);
+  }
+  return mapa;
+}
+
+function extrairInhoEpcar(rows){
+  const colsData = [2,5,8,11];
+  const mapa = new Map();
+  const reDia = /^(Segunda|Terça|Quarta|Quinta|Sexta|Sábado|Domingo)\b/i;
+  for(let i=0; i<rows.length; i++){
+    const row = rows[i] || [];
+    const col1 = (row[1]||'').trim();
+    if(!reDia.test(col1)) continue;
+    const diaTipo = col1;
+    const datesRow = rows[i+1] || [];
+    const datas = colsData.map(c=> (datesRow[c]||'').trim());
+    let j = i+2;
+    while(j < rows.length){
+      const r = rows[j] || [];
+      const horaLabel = (r[1]||'').trim();
+      const conteudos = colsData.map(c=> (r[c]||'').trim());
+      if(!horaLabel && conteudos.every(v=>!v)) break;
+      if(reDia.test(horaLabel)) break;
+      colsData.forEach((c, idx)=>{
+        const data = datas[idx], valor = conteudos[idx];
+        if(!data || !/^\d{1,2}\/\d{1,2}$/.test(data) || !valor) return;
+        const lista = mapa.get(data) || [];
+        lista.push({diaTipo, hora: horaLabel, conteudo: valor});
+        mapa.set(data, lista);
+      });
+      j++;
+    }
+    i = j-1;
+  }
+  return mapa;
+}
+
+const PLANILHAS = {
+  membroDia: {
+    csv: 'https://docs.google.com/spreadsheets/d/1SWqUFwz7qn9FU5poExcy9HAwBRtaZerJRFWx3jl4bB8/export?format=csv&gid=1323019780',
+    link: 'https://docs.google.com/spreadsheets/d/1SWqUFwz7qn9FU5poExcy9HAwBRtaZerJRFWx3jl4bB8/edit?gid=1323019780',
+    titulo: 'Membro do dia',
+    extrator: extrairMembroDia,
+  },
+  vestExtensivo: {
+    csv: 'https://docs.google.com/spreadsheets/d/10gl-u7uVnNxgW5SSTWgpyxoVltss5Yq1ZRSg-5E55Ag/export?format=csv',
+    link: 'https://docs.google.com/spreadsheets/d/10gl-u7uVnNxgW5SSTWgpyxoVltss5Yq1ZRSg-5E55Ag/edit',
+    titulo: 'Horários · CASDvest Extensivo',
+    extrator: extrairVestExtensivo,
+  },
+  vestSemi: {
+    csv: 'https://docs.google.com/spreadsheets/d/19L4wF2wxYoa7e7vR2uuJTQE8kAvylyuhN0HN-xEXy20/export?format=csv&gid=1951097798',
+    link: 'https://docs.google.com/spreadsheets/d/19L4wF2wxYoa7e7vR2uuJTQE8kAvylyuhN0HN-xEXy20/edit?gid=1951097798',
+    titulo: 'Horários · CASDvest Semiextensivo',
+    extrator: extrairVestSemi,
+  },
+  inhoExtensivo: {
+    csv: 'https://docs.google.com/spreadsheets/d/1ebCz1s0EfTwieOKwsEdxFdZxI-FrHyJ52qw3iGkdFgw/export?format=csv',
+    link: 'https://docs.google.com/spreadsheets/d/1ebCz1s0EfTwieOKwsEdxFdZxI-FrHyJ52qw3iGkdFgw/edit',
+    titulo: 'Horários · CASDinho Extensivo',
+    extrator: extrairInhoExtensivo,
+  },
+  inhoEpcar: {
+    csv: 'https://docs.google.com/spreadsheets/d/1dLbeyu2vRjBdr0JJX6EO23O9gybGf8t1bXL0b4rPVJs/export?format=csv',
+    link: 'https://docs.google.com/spreadsheets/d/1dLbeyu2vRjBdr0JJX6EO23O9gybGf8t1bXL0b4rPVJs/edit',
+    titulo: 'Horários · CASDinho EPCAR',
+    extrator: extrairInhoEpcar,
+  },
+};
+const planilhasCache = {};
+function carregarPlanilha(chave){
+  if(planilhasCache[chave]) return planilhasCache[chave];
+  const cfg = PLANILHAS[chave];
+  planilhasCache[chave] = fetch(cfg.csv)
+    .then(r=>{ if(!r.ok) throw new Error('falha ao buscar '+chave); return r.text(); })
+    .then(texto => cfg.extrator(parseCSV(texto)))
+    .catch(err=>{ console.warn('Não consegui carregar planilha', chave, err); return null; });
+  return planilhasCache[chave];
+}
 
 /* ================= horário padrão de aula (modelo, não data real) =================
    4 turmas fixas; Extensivo (T1, T2, T4) tem 5 aulas de 50min a partir das 18h,
@@ -1062,6 +1300,7 @@ function abrirDia(dataIso){
     </div>` : ''}
     ${itaEvs.length ? `<div class="ita-eventos-dia">${itaEvs.map(e=>`<div class="ie"><span class="tag">${ITA_EVENTOS_TIPO_LABEL[e.tipo]||e.tipo}</span><span>${escHtml(e.titulo)}</span></div>`).join('')}</div>` : ''}
     <div class="flags-row" id="flags-row"></div>
+    <div id="escalas-dia-wrap"></div>
     <p class="section-title" style="margin-bottom:8px">Eventos do CASD</p>
     <div class="lista-eventos-dia" id="lista-eventos-dia"></div>
     <div id="tarefas-dia-wrap"></div>
@@ -1111,6 +1350,7 @@ function abrirDia(dataIso){
   renderListaEventosDia(dataIso);
   renderTarefasDia(dataIso);
   renderHorarioDia(dataIso);
+  renderEscalasDia(dataIso);
 
   painel.querySelector('#form-add-evento').addEventListener('submit', e=>{
     e.preventDefault();
@@ -1223,6 +1463,84 @@ function renderHorarioDia(dataIso){
     slotEl.querySelector('.materia').addEventListener('change', e=> salvarSlotHorario(dia, turma, idx, 'materia', e.target.value.trim()));
     slotEl.querySelector('.pessoa').addEventListener('change', e=> salvarSlotHorario(dia, turma, idx, 'pessoa', e.target.value.trim()));
   });
+}
+
+async function renderEscalasDia(dataIso){
+  if(!overlayAtual) return;
+  const wrap = overlayAtual.fundo.querySelector('#escalas-dia-wrap');
+  wrap.innerHTML = '<p class="escala-vazio">Carregando escalas…</p>';
+
+  const [y,m,d] = dataIso.split('-').map(Number);
+  const ddmm = String(d).padStart(2,'0')+'/'+String(m).padStart(2,'0');
+  const dowIdx = diaSemanaSeg0(y,m,d); // 0=seg .. 6=dom
+  const secoes = [];
+
+  const membroMapa = await carregarPlanilha('membroDia');
+  if(!overlayAtual || overlayAtual.dataIso !== dataIso) return;
+  if(membroMapa){
+    const regs = membroMapa.get(ddmm) || [];
+    if(regs.length) secoes.push({
+      cfg: PLANILHAS.membroDia,
+      corpo: regs.map(r=>`<div class="escala-linha"><strong>${escHtml(r.turno)}</strong>${r.tag?` <span class="chip-time">${escHtml(r.tag)}</span>`:''}<br>${r.diretores.length?`Diretor(a): ${r.diretores.map(escHtml).join(', ')}<br>`:''}${r.membros.length?`Membros: ${r.membros.map(escHtml).join(', ')}`:''}</div>`).join('')
+    });
+  }
+
+  const vestExtMapa = await carregarPlanilha('vestExtensivo');
+  if(!overlayAtual || overlayAtual.dataIso !== dataIso) return;
+  if(vestExtMapa){
+    const regs = (vestExtMapa.get(ddmm) || []).slice().sort((a,b)=>a.periodo-b.periodo);
+    if(regs.length) secoes.push({
+      cfg: PLANILHAS.vestExtensivo,
+      corpo: `<table class="tabela-escala"><tbody>${regs.map(r=>`<tr><td>${r.periodo}ª aula</td><td>${escHtml(r.professor)}</td><td>${escHtml(r.materia)}</td></tr>`).join('')}</tbody></table>`
+    });
+  }
+
+  if(dowIdx <= 4){
+    const vestSemiMapa = await carregarPlanilha('vestSemi');
+    if(!overlayAtual || overlayAtual.dataIso !== dataIso) return;
+    if(vestSemiMapa){
+      const regs = vestSemiMapa.get(dowIdx) || [];
+      if(regs.length) secoes.push({
+        cfg: Object.assign({}, PLANILHAS.vestSemi, {titulo: PLANILHAS.vestSemi.titulo + ' (fixo semanal)'}),
+        corpo: `<table class="tabela-escala"><tbody>${regs.map(r=>`<tr><td class="mono">${escHtml(r.hora)}</td><td>${escHtml(r.professor)}</td><td>${escHtml(r.materia)}</td></tr>`).join('')}</tbody></table>`
+      });
+    }
+  }
+
+  const inhoExtMapa = await carregarPlanilha('inhoExtensivo');
+  if(!overlayAtual || overlayAtual.dataIso !== dataIso) return;
+  if(inhoExtMapa){
+    const regs = inhoExtMapa.get(ddmm) || [];
+    if(regs.length) secoes.push({
+      cfg: PLANILHAS.inhoExtensivo,
+      corpo: regs.map(r=> r.intervalo
+        ? `<div class="escala-linha mono">${escHtml(r.hora)} — Intervalo</div>`
+        : `<div class="escala-linha"><span class="mono">${escHtml(r.hora)}</span>${r.turno?` · ${escHtml(r.turno)}`:''}<br>${r.salas.filter(s=>s.valor).map(s=>`${escHtml(s.nome)}: ${escHtml(s.valor)}`).join(' · ')}</div>`
+      ).join('')
+    });
+  }
+
+  const inhoEpcarMapa = await carregarPlanilha('inhoEpcar');
+  if(!overlayAtual || overlayAtual.dataIso !== dataIso) return;
+  if(inhoEpcarMapa){
+    const regs = inhoEpcarMapa.get(ddmm) || [];
+    if(regs.length) secoes.push({
+      cfg: PLANILHAS.inhoEpcar,
+      corpo: `<table class="tabela-escala"><tbody>${regs.map(r=>`<tr><td class="mono">${escHtml(r.hora)}</td><td>${escHtml(r.conteudo)||'—'}</td></tr>`).join('')}</tbody></table>`
+    });
+  }
+
+  if(!secoes.length){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<p class="section-title" style="margin:14px 0 8px">Escalas e horários (planilhas externas)</p>` +
+    secoes.map(s=>`
+      <div class="escala-card">
+        <div class="escala-head">
+          <strong>${escHtml(s.cfg.titulo)}</strong>
+          <a href="${s.cfg.link}" target="_blank" rel="noopener">abrir planilha ↗</a>
+        </div>
+        ${s.corpo}
+      </div>
+    `).join('');
 }
 
 function fecharOverlay(){
