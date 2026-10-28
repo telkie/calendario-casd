@@ -1,0 +1,1502 @@
+<meta charset="utf-8">
+<title>Calendário CASD × ITA</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#F6F2E7; --surface:#FFFFFF; --surface-2:#EFE7D3; --surface-3:#E7DCBF;
+    --border:#DCD0AE; --border-strong:#C6B78C;
+    --text:#231F16; --text-dim:#6B604A; --text-faint:#A79A78;
+
+    --casd-blue:#1F4E79; --casd-blue-tint:#E4ECF3;
+    --ita-navy:#10263D; --ita-gold:#AD7F2B; --ita-gold-tint:#F1E4C4;
+
+    --good:#1F7A52; --good-tint:#DDEEE2; --good-strong:#155C3D;
+    --warn:#AD7F2B; --warn-tint:#F1E4C4; --warn-strong:#8A6520;
+    --crit:#AA3B30; --crit-tint:#F5DFDA; --crit-strong:#832A21;
+    --semana7-tint:#F1E4C4; --semana7-strong:#8A6520;
+    --semana8-tint:#F2D2B0; --semana8-strong:#9C4A1E;
+
+    --cat-marco:#AA3B30; --cat-prova:#1E6E68; --cat-institucional:#6E5CA6;
+    --cat-destaque:#AD7F2B; --cat-geral:#8C8264;
+
+    --fase-aulas:transparent; --fase-semaninha:#F1DCE4; --fase-exames:#F5DFDA;
+    --fase-recesso:#DDEEE2; --fase-fora:#DDEEE2;
+
+    --dept-des:#2a6fdb; --dept-des-tint:#e7eefb;
+    --dept-ens:#7a5fd1; --dept-ens-tint:#efecfa;
+    --dept-rh:#c94f78; --dept-rh-tint:#f9e9ee;
+    --dept-mkt:#c9892f; --dept-mkt-tint:#fbf0e1;
+    --dept-cap:#2f9e6e; --dept-cap-tint:#e3f5ec;
+    --dept-fin:#2f8c9e; --dept-fin-tint:#e3f2f5;
+    --dept-ges:#8a5fc9; --dept-ges-tint:#f0e9fb;
+
+    --shadow:0 1px 2px rgba(35,31,22,.06), 0 10px 28px -14px rgba(35,31,22,.28);
+    --radius:12px;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161B; --surface:#191D23; --surface-2:#1F242B; --surface-3:#272D35;
+      --border:#333A43; --border-strong:#454E59;
+      --text:#EDEAE0; --text-dim:#AFA890; --text-faint:#736C57;
+
+      --casd-blue:#6FA0D6; --casd-blue-tint:#1C2A38;
+      --ita-navy:#9FC1E3; --ita-gold:#D9B463; --ita-gold-tint:#2C2413;
+
+      --good:#5BC694; --good-tint:#12281E; --good-strong:#7ADCAA;
+      --warn:#D9B463; --warn-tint:#2C2413; --warn-strong:#E8C77E;
+      --crit:#E38176; --crit-tint:#301C19; --crit-strong:#F09A90;
+      --semana7-tint:#2C2413; --semana7-strong:#E8C77E;
+      --semana8-tint:#3A2515; --semana8-strong:#F0A264;
+
+      --cat-marco:#E38176; --cat-prova:#5FB3AB; --cat-institucional:#AC9BE0;
+      --cat-destaque:#D9B463; --cat-geral:#A79A78;
+
+      --fase-aulas:transparent; --fase-semaninha:#2C1E24; --fase-exames:#301F1C;
+      --fase-recesso:#12281E; --fase-fora:#12281E;
+
+      --dept-des:#5c93ea; --dept-des-tint:#1a2740;
+      --dept-ens:#a595ea; --dept-ens-tint:#241f3a;
+      --dept-rh:#e284a5; --dept-rh-tint:#33202a;
+      --dept-mkt:#e0ad5c; --dept-mkt-tint:#332a16;
+      --dept-cap:#5cd6a0; --dept-cap-tint:#153327;
+      --dept-fin:#5cc3d6; --dept-fin-tint:#15302f;
+      --dept-ges:#b09bed; --dept-ges-tint:#271f3a;
+
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -16px rgba(0,0,0,.6);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161B; --surface:#191D23; --surface-2:#1F242B; --surface-3:#272D35;
+    --border:#333A43; --border-strong:#454E59;
+    --text:#EDEAE0; --text-dim:#AFA890; --text-faint:#736C57;
+    --casd-blue:#6FA0D6; --casd-blue-tint:#1C2A38;
+    --ita-navy:#9FC1E3; --ita-gold:#D9B463; --ita-gold-tint:#2C2413;
+    --good:#5BC694; --good-tint:#12281E; --good-strong:#7ADCAA;
+    --warn:#D9B463; --warn-tint:#2C2413; --warn-strong:#E8C77E;
+    --crit:#E38176; --crit-tint:#301C19; --crit-strong:#F09A90;
+    --semana7-tint:#2C2413; --semana7-strong:#E8C77E;
+    --semana8-tint:#3A2515; --semana8-strong:#F0A264;
+    --cat-marco:#E38176; --cat-prova:#5FB3AB; --cat-institucional:#AC9BE0;
+    --cat-destaque:#D9B463; --cat-geral:#A79A78;
+    --fase-aulas:transparent; --fase-semaninha:#2C1E24; --fase-exames:#301F1C;
+    --fase-recesso:#12281E; --fase-fora:#12281E;
+    --dept-des:#5c93ea; --dept-des-tint:#1a2740;
+    --dept-ens:#a595ea; --dept-ens-tint:#241f3a;
+    --dept-rh:#e284a5; --dept-rh-tint:#33202a;
+    --dept-mkt:#e0ad5c; --dept-mkt-tint:#332a16;
+    --dept-cap:#5cd6a0; --dept-cap-tint:#153327;
+    --dept-fin:#5cc3d6; --dept-fin-tint:#15302f;
+    --dept-ges:#b09bed; --dept-ges-tint:#271f3a;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -16px rgba(0,0,0,.6);
+    color-scheme:dark;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:auto}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:'Inter',system-ui,sans-serif; font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased}
+  h1,h2,h3,.display{font-family:'Sora',system-ui,sans-serif; text-wrap:balance}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace; font-variant-numeric:tabular-nums}
+  [hidden]{display:none!important}
+  button{font:inherit; cursor:pointer}
+  button:focus-visible, [tabindex]:focus-visible, a:focus-visible{outline:2px solid var(--casd-blue); outline-offset:2px; border-radius:4px}
+  ::selection{background:var(--casd-blue-tint)}
+
+  .app{max-width:1180px; margin:0 auto; padding:20px 18px calc(64px + env(safe-area-inset-bottom,0px))}
+
+  /* ---------- topbar ---------- */
+  .topbar{display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; padding-bottom:18px; margin-bottom:18px; border-bottom:1px solid var(--border)}
+  .topbar .brand-eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:.09em; font-weight:700; color:var(--ita-gold); margin:0 0 6px; display:flex; align-items:center; gap:6px}
+  .topbar .brand-eyebrow .sep{color:var(--text-faint)}
+  .topbar .brand-eyebrow .casd{color:var(--casd-blue)}
+  .topbar h1{margin:0 0 6px; font-size:25px; font-weight:800; letter-spacing:-.01em}
+  .topbar p.sub{margin:0; font-size:13.5px; color:var(--text-dim); max-width:56ch}
+  .topbar-actions{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+  .btn{display:inline-flex; align-items:center; gap:6px; padding:8px 14px; border-radius:999px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text); font-size:12.5px; font-weight:600; box-shadow:var(--shadow); white-space:nowrap}
+  .btn:hover{border-color:var(--casd-blue)}
+  .btn.primary{background:var(--casd-blue); border-color:var(--casd-blue); color:#fff}
+  .btn.primary:hover{opacity:.92}
+  .btn.ghost{box-shadow:none; border-color:transparent; background:var(--surface-2)}
+  .status-chip{font-size:11px; font-weight:600; color:var(--text-faint); display:flex; align-items:center; gap:5px}
+  .status-dot{width:6px; height:6px; border-radius:50%; background:var(--text-faint)}
+  .status-dot.on{background:var(--good)}
+
+  /* ---------- faixa do ano ---------- */
+  .card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px}
+  .section-title{font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint); font-weight:700; margin:0 0 12px; display:flex; align-items:center; gap:8px}
+  .ano-strip-wrap{overflow-x:auto; padding-bottom:6px; margin-bottom:6px}
+  .ano-strip{display:flex; gap:2px; min-width:640px; position:relative; padding-top:16px}
+  .ano-strip .mes-tick{position:absolute; top:0; font-size:9.5px; font-weight:700; color:var(--text-faint); text-transform:uppercase; letter-spacing:.04em}
+  .semana-cel{flex:1; min-width:11px; height:26px; border-radius:3px; background:var(--surface-2); cursor:pointer; position:relative; border:1px solid transparent}
+  .semana-cel:hover{border-color:var(--border-strong)}
+  .semana-cel.fase-aulas{background:var(--surface-3)}
+  .semana-cel.fase-semaninha{background:var(--warn); opacity:.55}
+  .semana-cel.fase-exames{background:var(--crit); opacity:.65}
+  .semana-cel.fase-recesso,.semana-cel.fase-fora{background:var(--good); opacity:.4}
+  .semana-cel.atencao::after{content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--warn-strong)}
+  .semana-cel.feriado::before{content:''; position:absolute; top:2px; right:2px; width:4px; height:4px; border-radius:50%; background:var(--ita-gold)}
+  .semana-cel.hoje{outline:2px solid var(--casd-blue); outline-offset:1px}
+  .ano-legend{display:flex; gap:14px; flex-wrap:wrap; font-size:11.5px; color:var(--text-dim); margin-top:10px}
+  .ano-legend .item{display:flex; align-items:center; gap:6px}
+  .ano-legend .sw{width:10px; height:10px; border-radius:3px}
+
+  /* ---------- conflitos e janelas ---------- */
+  .duas-colunas{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:14px; margin:18px 0}
+  .painel.horizonte{border-top:3px solid var(--dept-des)}
+  .horizonte-linha{display:flex; align-items:baseline; gap:8px; padding:7px 9px; border-radius:9px; background:var(--surface-2); font-size:12.5px; margin-bottom:6px}
+  .horizonte-linha .chip-depto{flex:none; font-size:9.5px; font-weight:700; text-transform:uppercase; padding:2px 7px; border-radius:999px}
+  .horizonte-linha .txt{flex:1; color:var(--text-dim)}
+  .horizonte-linha .data{flex:none; font-weight:700}
+  .painel{border-radius:var(--radius); border:1px solid var(--border); box-shadow:var(--shadow); padding:16px; background:var(--surface)}
+  .painel.conflito{border-top:3px solid var(--crit)}
+  .painel.proximos{border-top:3px solid var(--ita-gold)}
+  .painel h3{margin:0 0 3px; font-size:14.5px; display:flex; align-items:center; gap:7px}
+  .painel .desc{font-size:12px; color:var(--text-dim); margin:0 0 12px}
+  .lista-flag{display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto}
+  .item-flag{display:flex; align-items:baseline; gap:9px; padding:8px 10px; border-radius:9px; background:var(--surface-2); font-size:12.5px}
+  .item-flag .data{flex:none; font-weight:700; color:var(--text-dim)}
+  .item-flag .txt{flex:1; min-width:0}
+  .item-flag .sem{flex:none; font-size:10.5px; color:var(--text-faint)}
+  .vazio{font-size:12.5px; color:var(--text-faint); padding:10px 2px}
+
+  /* ---------- grade de meses ---------- */
+  .grade-meses{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px; margin-top:18px}
+  .mes{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:14px; scroll-margin-top:14px}
+  .mes-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:8px}
+  .mes-head .titulo-clicavel{display:flex; align-items:center; gap:6px; background:var(--surface-2); border:1.5px solid transparent; padding:5px 11px 5px 5px; margin:-5px 0 -5px -5px; border-radius:999px; cursor:pointer; transition:background .15s, border-color .15s}
+  .mes-head .titulo-clicavel:hover, .mes-head .titulo-clicavel:focus-visible{background:var(--casd-blue-tint); border-color:var(--casd-blue)}
+  .mes-head .titulo-clicavel:hover h3, .mes-head .titulo-clicavel:focus-visible h3{color:var(--casd-blue)}
+  .mes-head .titulo-clicavel .lupa{font-size:11px; color:var(--text-faint); opacity:.7}
+  .mes-head .titulo-clicavel:hover .lupa, .mes-head .titulo-clicavel:focus-visible .lupa{opacity:1; color:var(--casd-blue)}
+  .mes-head h3{margin:0; font-size:15px; font-weight:700}
+  .mes-head .ano{font-size:10.5px; color:var(--text-faint); font-weight:600}
+  table.grade{width:100%; border-collapse:collapse; table-layout:fixed}
+  table.grade th{font-size:9.5px; color:var(--text-faint); font-weight:700; text-transform:uppercase; padding-bottom:5px}
+  table.grade td{padding:1px; vertical-align:top; height:44px}
+  td.cel-semana{vertical-align:middle; text-align:center; padding:1px 2px 1px 0}
+  .rotulo-semana{font-size:8.5px; font-weight:700; color:var(--text-faint); font-family:'IBM Plex Mono',ui-monospace,monospace}
+  .rotulo-semana.atencao{color:var(--warn-strong)}
+  .rotulo-semana.semana-7{color:var(--semana7-strong)}
+  .rotulo-semana.semana-8{color:var(--semana8-strong)}
+  .rotulo-semana.fase-exames{color:var(--crit-strong)}
+  .rotulo-semana.fase-semaninha{color:var(--warn-strong)}
+  .dia{position:relative; width:100%; height:100%; border-radius:7px; padding:3px 3px 2px; background:var(--fase-aulas); border:1.5px solid transparent; cursor:pointer; display:flex; flex-direction:column; gap:2px}
+  .dia:hover{border-color:var(--border-strong)}
+  .dia.vazio-cel{cursor:default}
+  .dia.vazio-cel:hover{border-color:transparent}
+  .dia.fase-semaninha{background:var(--fase-semaninha)}
+  .dia.fase-exames{background:var(--fase-exames)}
+  .dia.fase-recesso,.dia.fase-fora{background:var(--fase-recesso)}
+  .dia.atencao{background:var(--warn-tint)}
+  .dia.semana-8{background:var(--semana8-tint)}
+  .dia.feriado::after{content:''; position:absolute; top:3px; right:3px; width:5px; height:5px; border-radius:50%; background:var(--ita-gold)}
+  .dia .num{font-size:10.5px; font-weight:600; color:var(--text-dim)}
+  .dia.hoje{background:var(--casd-blue-tint)}
+  .dia.hoje .num{color:var(--casd-blue); font-weight:800}
+  .dia .pontos{display:flex; flex-wrap:wrap; gap:2px; align-items:center}
+  .ponto{width:6px; height:6px; border-radius:50%; flex:none; padding:3px; background-clip:content-box; margin:-3px}
+  .ponto.mais{width:auto; height:auto; font-size:8px; font-weight:700; color:var(--text-faint); border-radius:0}
+  .dia.flag-vermelho{border-color:var(--crit); border-width:2px}
+  .dia.flag-verde{border-color:var(--good); border-width:2px}
+  .dia.flag-amarelo{border-color:var(--warn); border-width:2px}
+  .ponto{cursor:grab}
+  .ponto-tarefa{width:5px; height:5px; border-radius:1px; flex:none; padding:3px; background-clip:content-box; margin:-3px}
+  .tarefa-card{border:1px solid var(--border); border-radius:10px; padding:8px 10px; background:var(--surface-2); display:flex; align-items:flex-start; gap:8px; margin-bottom:6px}
+  .tarefa-card .cat-dot{width:8px; height:8px; border-radius:2px; margin-top:4px; flex:none}
+  .tarefa-card .corpo{flex:1; min-width:0}
+  .tarefa-card .titulo-t{font-size:12.5px; font-weight:600; line-height:1.3}
+  .tarefa-card .meta-t{font-size:11px; color:var(--text-faint); margin-top:2px}
+  .ponto.arrastando{opacity:.35}
+
+  /* ---------- zoom de mês ---------- */
+  .zoom-cabecalho{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:18px 0 12px}
+  .zoom-cabecalho h2{margin:0; font-size:20px; display:flex; align-items:center; gap:8px}
+  .zoom-voltar{display:inline-flex; align-items:center; gap:5px; background:none; border:none; color:var(--text-dim); font-size:12.5px; font-weight:600; padding:6px 0}
+  .zoom-voltar:hover{color:var(--casd-blue)}
+  .zoom-nav{display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; border:1.5px solid var(--border-strong); background:var(--surface); color:var(--text-dim); font-size:14px; flex:none}
+  .zoom-nav:hover{border-color:var(--casd-blue); color:var(--casd-blue)}
+  .zoom-toolbar{display:flex; align-items:center; gap:8px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 8px 6px 14px; box-shadow:var(--shadow)}
+  .zoom-toolbar .rotulo-tb{font-size:11.5px; color:var(--text-faint); font-weight:600}
+  .ferramenta-btn{display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; border:1.5px solid transparent; background:var(--surface-2); font-size:12px; font-weight:600; color:var(--text-dim)}
+  .ferramenta-btn .sw{width:9px; height:9px; border-radius:50%}
+  .ferramenta-btn.ativa{border-color:currentColor; background:var(--surface-2)}
+  .ferramenta-btn.vermelho.ativa{color:var(--crit)}
+  .ferramenta-btn.verde.ativa{color:var(--good)}
+  .ferramenta-btn.amarelo.ativa{color:var(--warn)}
+  .ferramenta-btn.limpar.ativa{color:var(--text)}
+  .zoom-dica{font-size:11.5px; color:var(--text-faint); margin:0 0 12px}
+
+  table.grade-zoom{width:100%; border-collapse:separate; border-spacing:4px; table-layout:fixed}
+  table.grade-zoom th{font-size:10.5px; color:var(--text-faint); font-weight:700; text-transform:uppercase; padding-bottom:6px}
+  td.cel-semana-zoom{width:40px; vertical-align:middle; text-align:center; padding:0}
+  td.cel-semana-zoom .rotulo-semana{font-size:16px; letter-spacing:.01em}
+  .dia-zoom{position:relative; min-height:104px; border-radius:11px; padding:6px 7px; background:var(--fase-aulas); border:2px solid var(--border); cursor:pointer; display:flex; flex-direction:column; gap:3px}
+  .zoom-pintura .dia-zoom{cursor:crosshair}
+  .dia-zoom.vazio-cel{visibility:hidden}
+  .dia-zoom:hover{border-color:var(--border-strong)}
+  .dia-zoom.fase-semaninha{background:var(--fase-semaninha)}
+  .dia-zoom.fase-exames{background:var(--fase-exames)}
+  .dia-zoom.fase-recesso,.dia-zoom.fase-fora{background:var(--fase-recesso)}
+  .dia-zoom.atencao{background:var(--warn-tint)}
+  .dia-zoom.semana-8{background:var(--semana8-tint)}
+  .dia-zoom.feriado::after{content:''; position:absolute; top:6px; right:6px; width:6px; height:6px; border-radius:50%; background:var(--ita-gold)}
+  .dia-zoom.hoje{background:var(--casd-blue-tint); border-color:var(--casd-blue)}
+  .dia-zoom .num-zoom{font-size:13px; font-weight:700; color:var(--text-dim)}
+  .dia-zoom.hoje .num-zoom{color:var(--casd-blue)}
+  .dia-zoom.flag-vermelho{border-color:var(--crit)}
+  .dia-zoom.flag-verde{border-color:var(--good)}
+  .dia-zoom.flag-amarelo{border-color:var(--warn)}
+  .dia-zoom .lista-ev-zoom{display:flex; flex-direction:column; gap:1px}
+  .item-ev-zoom{display:flex; align-items:center; gap:4px; font-size:10px; color:var(--text-dim); line-height:1.25}
+  .item-ev-zoom .pt{width:5px; height:5px; border-radius:50%; flex:none}
+  .item-ev-zoom span:last-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .dia-zoom .mais-zoom{font-size:9.5px; color:var(--text-faint); font-weight:600}
+  .dia-zoom .semana-badge{position:absolute; bottom:5px; right:6px; font-size:8px; font-family:'IBM Plex Mono',monospace; color:var(--text-faint)}
+  .dia-zoom .semana-badge.semana-7{color:var(--semana7-strong)}
+  .dia-zoom .semana-badge.semana-8{color:var(--semana8-strong); font-weight:700}
+  @media (max-width:640px){
+    .dia-zoom{min-height:78px}
+    .item-ev-zoom{font-size:9px}
+  }
+  .dia.drop-alvo{background:var(--casd-blue-tint); border-color:var(--casd-blue)}
+
+  /* ---------- legenda ---------- */
+  .legenda-final{margin-top:20px; display:flex; flex-wrap:wrap; gap:18px 26px; font-size:12px; color:var(--text-dim)}
+  .legenda-final .grupo{display:flex; flex-direction:column; gap:7px}
+  .legenda-final .grupo .titulo{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; font-weight:700; color:var(--text-faint)}
+  .legenda-final .item{display:flex; align-items:center; gap:7px}
+  .legenda-final .sw{width:11px; height:11px; border-radius:3px; flex:none}
+  .legenda-final .sw.dot{border-radius:50%; width:7px; height:7px}
+
+  /* ---------- overlay / painel de dia ---------- */
+  .overlay-fundo{position:fixed; inset:0; background:rgba(16,14,8,.42); display:flex; align-items:flex-start; justify-content:center; padding:5vh 16px; z-index:40; overflow-y:auto}
+  @media (max-width:640px){.overlay-fundo{padding:0; align-items:stretch}}
+  .overlay-painel{background:var(--surface); border-radius:16px; box-shadow:0 30px 60px -20px rgba(0,0,0,.4); width:100%; max-width:460px; padding:20px; margin:auto 0}
+  @media (max-width:640px){.overlay-painel{border-radius:0; max-width:none; min-height:100%; margin:0}}
+  .overlay-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:4px}
+  .overlay-head h2{margin:0; font-size:19px}
+  .overlay-head .fechar{background:var(--surface-2); border:none; border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; font-size:15px; color:var(--text-dim); flex:none}
+  .overlay-sub{font-size:12px; color:var(--text-faint); margin:0 0 14px}
+  .ita-status{display:flex; align-items:center; gap:9px; padding:10px 12px; border-radius:10px; margin-bottom:14px; font-size:12.5px}
+  .ita-status .icone{width:9px; height:9px; border-radius:50%; flex:none}
+  .ita-status.aulas{background:var(--surface-2); color:var(--text-dim)}
+  .ita-status.semaninha{background:var(--warn-tint); color:var(--warn-strong)}
+  .ita-status.exames{background:var(--crit-tint); color:var(--crit-strong)}
+  .ita-status.recesso,.ita-status.fora{background:var(--good-tint); color:var(--good-strong)}
+  .ita-status.atencao{background:var(--warn-tint); color:var(--warn-strong); margin-top:-8px}
+  .ita-eventos-dia{display:flex; flex-direction:column; gap:5px; margin:-6px 0 14px; font-size:12px; color:var(--text-dim)}
+  .ita-eventos-dia .ie{display:flex; gap:6px}
+  .ita-eventos-dia .tag{flex:none; font-size:9.5px; font-weight:700; text-transform:uppercase; color:var(--ita-gold)}
+
+  .flags-row{display:flex; gap:8px; margin-bottom:16px}
+  .flag-btn{flex:1; padding:8px 4px; border-radius:9px; border:1.5px solid var(--border); background:var(--surface); font-size:11.5px; font-weight:600; color:var(--text-dim); display:flex; align-items:center; justify-content:center; gap:5px}
+  .flag-btn .sw{width:8px; height:8px; border-radius:50%}
+  .flag-btn.ativo{background:var(--surface-2); border-color:currentColor}
+  .flag-btn.vermelho.ativo{color:var(--crit)}
+  .flag-btn.verde.ativo{color:var(--good)}
+  .flag-btn.amarelo.ativo{color:var(--warn)}
+
+  .lista-eventos-dia{display:flex; flex-direction:column; gap:8px; margin-bottom:14px}
+  .evento-card{border:1px solid var(--border); border-radius:10px; padding:9px 10px; background:var(--surface-2)}
+  .evento-card .linha1{display:flex; align-items:flex-start; gap:8px}
+  .evento-card .cat-dot{width:8px; height:8px; border-radius:50%; margin-top:4px; flex:none}
+  .evento-card .titulo-ev{flex:1; font-size:13px; font-weight:600; line-height:1.3; background:none; border:none; color:var(--text); font-family:inherit; width:100%; resize:none; padding:0}
+  .evento-card .acoes{display:flex; align-items:center; gap:6px; margin-top:7px}
+  .evento-card select{font-size:11px; font-family:inherit; padding:3px 6px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim)}
+  .evento-card .del{margin-left:auto; background:none; border:none; color:var(--text-faint); font-size:11px; font-weight:600}
+  .evento-card .del:hover{color:var(--crit)}
+  .sem-eventos{font-size:12.5px; color:var(--text-faint); padding:6px 0 2px}
+
+  /* ---------- horário de aula (modelo padrão) ---------- */
+  table.horario{border-collapse:separate; border-spacing:3px; width:100%; min-width:360px}
+  table.horario th{font-size:9px; color:var(--text-faint); font-weight:700; text-align:center; padding:2px}
+  table.horario .slot-hora{font-size:8.5px; color:var(--text-faint)}
+  .slot-horario{background:var(--surface-2); border-radius:8px; padding:5px 6px; display:flex; flex-direction:column; gap:2px; min-width:76px}
+  .slot-horario input{border:none; background:transparent; font-size:10.5px; color:var(--text); font-family:inherit; padding:1px 0; width:100%; min-width:0}
+  .slot-horario input.materia{font-weight:600}
+  .slot-horario input.pessoa{color:var(--text-dim); font-size:9.5px}
+  .slot-horario input::placeholder{color:var(--text-faint)}
+  .slot-horario input:focus{outline:1.5px solid var(--casd-blue); border-radius:4px}
+  .slot-vazio{opacity:.3; text-align:center; font-size:10px; color:var(--text-faint); padding-top:8px}
+
+  .form-add{display:flex; gap:6px; margin-top:4px}
+  .form-add input{flex:1; padding:8px 10px; border-radius:9px; border:1px solid var(--border); background:var(--surface); color:var(--text); font-size:12.5px; font-family:inherit}
+  .form-add input:focus{outline:2px solid var(--casd-blue); outline-offset:1px}
+  .form-add button{flex:none; padding:8px 12px; border-radius:9px; border:none; background:var(--casd-blue); color:#fff; font-size:12px; font-weight:700}
+
+  /* ---------- opções extra do evento (tipo/time/visibilidade/responsável) ---------- */
+  .campos-evento{display:flex; flex-direction:column; gap:6px; margin-top:4px}
+  .campos-evento .linha-campos{display:flex; gap:6px; flex-wrap:wrap}
+  .campos-evento select{flex:1; min-width:110px; font-size:11.5px; font-family:inherit; padding:6px 8px; border-radius:8px; border:1px solid var(--border); background:var(--surface); color:var(--text-dim)}
+  .chip-time{display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700; text-transform:uppercase; padding:2px 7px; border-radius:999px; margin-right:4px}
+  .chip-privado{display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700; text-transform:uppercase; padding:2px 7px; border-radius:999px; background:var(--surface-3); color:var(--text-dim)}
+
+  /* ---------- login ---------- */
+  .login-fundo{position:fixed; inset:0; background:var(--bg); display:flex; align-items:center; justify-content:center; z-index:80; padding:16px}
+  .login-caixa{background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:var(--shadow); padding:32px 28px; max-width:360px; width:100%; text-align:center}
+  .login-caixa h1{font-size:19px; margin:0 0 6px}
+  .login-caixa p{font-size:13px; color:var(--text-dim); margin:0 0 20px}
+  .btn-google{display:inline-flex; align-items:center; gap:10px; padding:10px 18px; border-radius:9px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text); font-size:13.5px; font-weight:600; box-shadow:var(--shadow)}
+  .btn-google:hover{border-color:var(--casd-blue)}
+
+  /* ---------- filtro pessoal ---------- */
+  .painel.filtro{border-top:3px solid var(--casd-blue)}
+  .filtro-times{display:flex; flex-wrap:wrap; gap:6px}
+  .filtro-chip{display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:999px; border:1.5px solid var(--border); background:var(--surface); font-size:11.5px; font-weight:600; color:var(--text-dim)}
+  .filtro-chip .sw{width:8px; height:8px; border-radius:2px}
+  .filtro-chip.oculto{opacity:.45; text-decoration:line-through}
+
+  .toast{position:fixed; bottom:calc(18px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%); background:var(--ita-navy); color:#fff; padding:9px 16px; border-radius:999px; font-size:12.5px; box-shadow:var(--shadow); z-index:60}
+
+  @media (max-width:520px){
+    .topbar h1{font-size:21px}
+    .grade-meses{grid-template-columns:1fr}
+  }
+</style>
+
+<div class="login-fundo" id="login-fundo">
+  <div class="login-caixa">
+    <h1>Calendário CASD</h1>
+    <p>Entre com sua conta Google do CASD pra ver e criar eventos.</p>
+    <button class="btn-google" id="btn-login-google">Entrar com Google</button>
+  </div>
+</div>
+
+<div class="app" id="app-conteudo" hidden>
+  <header class="topbar">
+    <div>
+      <p class="brand-eyebrow"><span class="casd">CASD</span><span class="sep">×</span><span>ITA</span></p>
+      <h1>Calendário cruzado — 2026</h1>
+      <p class="sub" id="subtitulo-topo">Datas e eventos do CASD (VEST, INHO, EXT) sobre o ritmo letivo do ITA (períodos, semaninhas e exames) — pra achar janelas livres e evitar bater com a semana de provas de quem é do ITA.</p>
+    </div>
+    <div class="topbar-actions">
+      <span class="status-chip" id="chip-conexao"><span class="status-dot" id="dot-conexao"></span><span id="texto-conexao">conectando…</span></span>
+      <span class="status-chip" id="chip-usuario" hidden></span>
+      <button class="btn" id="btn-hoje">Ir para hoje</button>
+      <button class="btn primary" id="btn-novo">+ Evento</button>
+    </div>
+  </header>
+
+  <section class="card">
+    <p class="section-title">O ano do ITA de relance</p>
+    <div class="ano-strip-wrap">
+      <div class="ano-strip" id="ano-strip"></div>
+    </div>
+    <div class="ano-legend">
+      <span class="item"><span class="sw" style="background:var(--surface-3)"></span>aulas normais</span>
+      <span class="item"><span class="sw" style="background:var(--warn); opacity:.55"></span>semaninha</span>
+      <span class="item"><span class="sw" style="background:var(--crit); opacity:.65"></span>semana de exames</span>
+      <span class="item"><span class="sw" style="background:var(--good); opacity:.4"></span>recesso / fora do período — livre</span>
+      <span class="item"><span class="sw" style="background:var(--warn-strong); border-radius:50%; width:6px; height:6px"></span>bolinha embaixo = 7ª/8ª semana (atenção)</span>
+      <span class="item"><span class="sw" style="background:var(--ita-gold); border-radius:50%; width:6px; height:6px"></span>bolinha em cima = tem feriado nacional</span>
+    </div>
+  </section>
+
+  <div class="duas-colunas">
+    <div class="painel conflito">
+      <h3>⚠ Possíveis conflitos</h3>
+      <p class="desc">Eventos do CASD que caem em feriado nacional, semana de exames, semaninha (muita gente do ITA volta pra casa) ou na 7ª/8ª semana do bloco (reta final, cronograma mais apertado).</p>
+      <div class="lista-flag" id="lista-conflitos"></div>
+    </div>
+    <div class="painel proximos">
+      <h3>📅 Próximos eventos e feriados</h3>
+      <p class="desc">O que vem a seguir no calendário do CASD e os feriados nacionais do ITA.</p>
+      <div class="lista-flag" id="lista-proximos"></div>
+    </div>
+    <div class="painel horizonte">
+      <h3>◔ Horizonte de tarefas</h3>
+      <p class="desc">Até onde o planejamento de tarefas dos membros já se estende, por departamento.</p>
+      <div id="lista-horizonte"></div>
+    </div>
+    <div class="painel filtro">
+      <h3>🙈 Meu filtro</h3>
+      <p class="desc">Times que você decidiu não ver no seu calendário (não afeta o que você PODE ver, só o que aparece pra você). Clique pra ligar/desligar.</p>
+      <div class="filtro-times" id="filtro-times"></div>
+    </div>
+  </div>
+
+  <div class="grade-meses" id="grade-meses"></div>
+  <div id="mes-zoom" hidden></div>
+
+  <div class="legenda-final">
+    <div class="grupo">
+      <span class="titulo">Categoria do evento CASD</span>
+      <span class="item"><span class="sw dot" style="background:var(--cat-marco)"></span>Marco / data-chave</span>
+      <span class="item"><span class="sw dot" style="background:var(--cat-prova)"></span>Prova externa (vestibular)</span>
+      <span class="item"><span class="sw dot" style="background:var(--cat-institucional)"></span>Institucional / social</span>
+      <span class="item"><span class="sw dot" style="background:var(--cat-destaque)"></span>Destaque / feriado</span>
+      <span class="item"><span class="sw dot" style="background:var(--cat-geral)"></span>Geral / prazo</span>
+    </div>
+    <div class="grupo">
+      <span class="titulo">Marcação manual</span>
+      <span class="item"><span class="sw" style="border:2px solid var(--crit); background:transparent"></span>Vermelho — conflito</span>
+      <span class="item"><span class="sw" style="border:2px solid var(--good); background:transparent"></span>Verde — janela boa</span>
+      <span class="item"><span class="sw" style="border:2px solid var(--warn); background:transparent"></span>Amarelo — atenção</span>
+    </div>
+    <div class="grupo">
+      <span class="titulo">Tarefas de membros</span>
+      <span class="item"><span class="sw" style="background:var(--dept-des); border-radius:1px"></span>DES</span>
+      <span class="item"><span class="sw" style="background:var(--dept-ens); border-radius:1px"></span>ENS</span>
+      <span class="item"><span class="sw" style="background:var(--dept-rh); border-radius:1px"></span>RH</span>
+      <span class="item"><span class="sw" style="background:var(--dept-mkt); border-radius:1px"></span>MKT</span>
+      <span class="item"><span class="sw" style="background:var(--dept-cap); border-radius:1px"></span>CAP</span>
+      <span class="item"><span class="sw" style="background:var(--dept-fin); border-radius:1px"></span>FIN</span>
+      <span class="item"><span class="sw" style="background:var(--dept-ges); border-radius:1px"></span>GES</span>
+      <span class="item" style="color:var(--text-faint)">quadradinhos = tarefas de membros; o selo de texto do lado (ex: VEST/INHO/EXT) mostra a frente</span>
+    </div>
+    <div class="grupo">
+      <span class="titulo">Grade dos meses</span>
+      <span class="item" style="color:var(--text-faint)">🔍 Toque no nome do mês pra abrir ele em tela cheia (marcar vermelho/verde/amarelo arrastando)</span>
+      <span class="item" style="color:var(--text-faint)">Coluna "Sem" à esquerda = nº da semana do ITA</span>
+      <span class="item"><span class="sw dot" style="background:var(--ita-gold)"></span>Ponto de amarelo no dia = feriado nacional do ITA</span>
+      <span class="item" style="color:var(--text-faint)">Abrir um dia de seg. a sáb. mostra o horário de aula editável</span>
+    </div>
+    <div class="grupo">
+      <span class="titulo">Fontes</span>
+      <span class="item" style="color:var(--text-faint)">CASD: Calendário Interno CASDvest 2026</span>
+      <span class="item" style="color:var(--text-faint)">ITA: Calendário Escolar 2026 (Pró-Reitoria de Graduação)</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= dados estáticos do ITA (referência, não editável) ================= */
+const ITA_SEMANAS = [{"inicio":"2026-02-23","fim":"2026-03-01","periodo":0,"fase":"fora","rotulo":null,"atencao":false},{"inicio":"2026-03-02","fim":"2026-03-08","periodo":1,"fase":"aulas","rotulo":"1","atencao":false},{"inicio":"2026-03-09","fim":"2026-03-15","periodo":1,"fase":"aulas","rotulo":"2","atencao":false},{"inicio":"2026-03-16","fim":"2026-03-22","periodo":1,"fase":"aulas","rotulo":"3","atencao":false},{"inicio":"2026-03-23","fim":"2026-03-29","periodo":1,"fase":"aulas","rotulo":"4","atencao":false},{"inicio":"2026-03-30","fim":"2026-04-05","periodo":1,"fase":"aulas","rotulo":"5","atencao":false},{"inicio":"2026-04-06","fim":"2026-04-12","periodo":1,"fase":"aulas","rotulo":"6","atencao":false},{"inicio":"2026-04-13","fim":"2026-04-19","periodo":1,"fase":"aulas","rotulo":"7","atencao":true},{"inicio":"2026-04-20","fim":"2026-04-26","periodo":1,"fase":"aulas","rotulo":"8","atencao":true},{"inicio":"2026-04-27","fim":"2026-05-03","periodo":1,"fase":"semaninha","rotulo":"s","atencao":false},{"inicio":"2026-05-04","fim":"2026-05-10","periodo":1,"fase":"aulas","rotulo":"1","atencao":false},{"inicio":"2026-05-11","fim":"2026-05-17","periodo":1,"fase":"aulas","rotulo":"2","atencao":false},{"inicio":"2026-05-18","fim":"2026-05-24","periodo":1,"fase":"aulas","rotulo":"3","atencao":false},{"inicio":"2026-05-25","fim":"2026-05-31","periodo":1,"fase":"aulas","rotulo":"4","atencao":false},{"inicio":"2026-06-01","fim":"2026-06-07","periodo":1,"fase":"aulas","rotulo":"5","atencao":false},{"inicio":"2026-06-08","fim":"2026-06-14","periodo":1,"fase":"aulas","rotulo":"6","atencao":false},{"inicio":"2026-06-15","fim":"2026-06-21","periodo":1,"fase":"aulas","rotulo":"7","atencao":true},{"inicio":"2026-06-22","fim":"2026-06-28","periodo":1,"fase":"aulas","rotulo":"8","atencao":true},{"inicio":"2026-06-29","fim":"2026-07-05","periodo":1,"fase":"exames","rotulo":"Ex1","atencao":false},{"inicio":"2026-07-06","fim":"2026-07-12","periodo":1,"fase":"exames","rotulo":"Ex2","atencao":false},{"inicio":"2026-07-13","fim":"2026-07-19","periodo":0,"fase":"recesso","rotulo":null,"atencao":false},{"inicio":"2026-07-20","fim":"2026-07-26","periodo":0,"fase":"recesso","rotulo":null,"atencao":false},{"inicio":"2026-07-27","fim":"2026-08-02","periodo":0,"fase":"recesso","rotulo":null,"atencao":false},{"inicio":"2026-08-03","fim":"2026-08-09","periodo":2,"fase":"aulas","rotulo":"1","atencao":false},{"inicio":"2026-08-10","fim":"2026-08-16","periodo":2,"fase":"aulas","rotulo":"2","atencao":false},{"inicio":"2026-08-17","fim":"2026-08-23","periodo":2,"fase":"aulas","rotulo":"3","atencao":false},{"inicio":"2026-08-24","fim":"2026-08-30","periodo":2,"fase":"aulas","rotulo":"4","atencao":false},{"inicio":"2026-08-31","fim":"2026-09-06","periodo":2,"fase":"aulas","rotulo":"5","atencao":false},{"inicio":"2026-09-07","fim":"2026-09-13","periodo":2,"fase":"aulas","rotulo":"6","atencao":false},{"inicio":"2026-09-14","fim":"2026-09-20","periodo":2,"fase":"aulas","rotulo":"7","atencao":true},{"inicio":"2026-09-21","fim":"2026-09-27","periodo":2,"fase":"aulas","rotulo":"8","atencao":true},{"inicio":"2026-09-28","fim":"2026-10-04","periodo":2,"fase":"semaninha","rotulo":"s","atencao":false},{"inicio":"2026-10-05","fim":"2026-10-11","periodo":2,"fase":"aulas","rotulo":"1","atencao":false},{"inicio":"2026-10-12","fim":"2026-10-18","periodo":2,"fase":"aulas","rotulo":"2","atencao":false},{"inicio":"2026-10-19","fim":"2026-10-25","periodo":2,"fase":"aulas","rotulo":"3","atencao":false},{"inicio":"2026-10-26","fim":"2026-11-01","periodo":2,"fase":"aulas","rotulo":"4","atencao":false},{"inicio":"2026-11-02","fim":"2026-11-08","periodo":2,"fase":"aulas","rotulo":"5","atencao":false},{"inicio":"2026-11-09","fim":"2026-11-15","periodo":2,"fase":"aulas","rotulo":"6","atencao":false},{"inicio":"2026-11-16","fim":"2026-11-22","periodo":2,"fase":"aulas","rotulo":"7","atencao":true},{"inicio":"2026-11-23","fim":"2026-11-29","periodo":2,"fase":"aulas","rotulo":"8","atencao":true},{"inicio":"2026-11-30","fim":"2026-12-06","periodo":2,"fase":"exames","rotulo":"Ex1","atencao":false},{"inicio":"2026-12-07","fim":"2026-12-13","periodo":2,"fase":"exames","rotulo":"Ex2","atencao":false},{"inicio":"2026-12-14","fim":"2026-12-20","periodo":0,"fase":"recesso","rotulo":null,"atencao":false},{"inicio":"2026-12-21","fim":"2026-12-27","periodo":0,"fase":"recesso","rotulo":null,"atencao":false},{"inicio":"2026-12-28","fim":"2027-01-03","periodo":0,"fase":"recesso","rotulo":null,"atencao":false}];
+const ITA_DIA_COR = {"2026-12-01":"exame_docente","2026-12-02":"exame_docente","2026-12-03":"exame_docente","2026-12-04":"exame_docente","2026-12-07":"exame_docente","2026-12-08":"exame_docente","2026-12-09":"exame_docente","2026-12-10":"exame_docente","2026-12-11":"exame_docente","2026-12-16":"cporaer","2026-12-17":"cporaer","2026-12-18":"colacao","2026-12-25":"nao_letivo","2026-04-03":"nao_letivo","2026-04-04":"nao_letivo","2026-04-05":"nao_letivo","2026-04-20":"nao_letivo","2026-04-21":"nao_letivo","2026-04-27":"semaninha","2026-04-28":"semaninha","2026-04-29":"semaninha","2026-04-30":"semaninha","2026-05-01":"nao_letivo","2026-05-11":"evento","2026-05-12":"evento","2026-05-13":"evento","2026-05-14":"evento","2026-05-15":"evento","2026-06-03":"nao_letivo","2026-06-04":"nao_letivo","2026-06-05":"nao_letivo","2026-06-29":"exame_docente","2026-06-30":"exame_docente","2026-03-02":"epoca2","2026-03-03":"epoca2","2026-03-04":"epoca2","2026-03-05":"epoca2","2026-03-06":"epoca2","2026-03-18":"nao_letivo","2026-03-19":"nao_letivo","2026-03-24":"nao_letivo","2026-03-25":"nao_letivo","2026-08-03":"epoca2","2026-08-04":"epoca2","2026-08-05":"epoca2","2026-08-06":"epoca2","2026-08-07":"epoca2","2026-08-10":"cporaer","2026-07-01":"exame_docente","2026-07-02":"exame_docente","2026-07-03":"exame_docente","2026-07-06":"exame_docente","2026-07-07":"exame_docente","2026-07-08":"exame_docente","2026-07-09":"nao_letivo","2026-07-10":"exame_docente","2026-07-13":"nao_letivo","2026-07-14":"nao_letivo","2026-07-15":"nao_letivo","2026-07-16":"nao_letivo","2026-07-17":"nao_letivo","2026-07-20":"nao_letivo","2026-07-21":"nao_letivo","2026-07-22":"nao_letivo","2026-07-23":"nao_letivo","2026-07-24":"nao_letivo","2026-07-27":"nao_letivo","2026-07-28":"nao_letivo","2026-07-29":"nao_letivo","2026-07-30":"nao_letivo","2026-07-31":"nao_letivo","2026-09-04":"cporaer","2026-09-07":"nao_letivo","2026-09-14":"evento","2026-09-16":"cporaer","2026-09-17":"cporaer","2026-09-28":"semaninha","2026-09-29":"semaninha","2026-09-30":"semaninha","2026-11-02":"nao_letivo","2026-11-06":"cporaer","2026-11-14":"nao_letivo","2026-11-15":"nao_letivo","2026-11-20":"nao_letivo","2026-11-30":"exame_docente","2026-10-01":"semaninha","2026-10-02":"semaninha","2026-10-12":"nao_letivo","2026-10-15":"evento","2026-10-22":"cporaer","2026-10-23":"nao_letivo"};
+const ITA_EVENTOS = [{"data":"2026-03-19","titulo":"Dia de São José","tipo":"feriado"},{"data":"2026-03-25","titulo":"Especialista AER","tipo":"feriado"},{"data":"2026-04-03","titulo":"Paixão","tipo":"feriado"},{"data":"2026-04-05","titulo":"Páscoa","tipo":"feriado"},{"data":"2026-04-21","titulo":"Tiradentes","tipo":"feriado"},{"data":"2026-05-01","titulo":"Trabalho","tipo":"feriado"},{"data":"2026-06-04","titulo":"Corpus Christi","tipo":"feriado"},{"data":"2026-06-05","titulo":"Emenda","tipo":"feriado"},{"data":"2026-07-09","titulo":"Rev. Constituc.","tipo":"feriado"},{"data":"2026-07-20","titulo":"Aniv. Stos Dumont","tipo":"feriado"},{"data":"2026-07-27","titulo":"Aniv. SJC","tipo":"feriado"},{"data":"2026-09-07","titulo":"Independência","tipo":"feriado"},{"data":"2026-10-12","titulo":"N.S. Aparecida","tipo":"feriado"},{"data":"2026-10-23","titulo":"Aviador","tipo":"feriado"},{"data":"2026-11-02","titulo":"Finados","tipo":"feriado"},{"data":"2026-11-15","titulo":"República","tipo":"feriado"},{"data":"2026-11-20","titulo":"Consc. Negra","tipo":"feriado"},{"data":"2026-12-25","titulo":"Natal","tipo":"feriado"},{"data":"2026-05-11","titulo":"Semana da Engenharia (tarde)","tipo":"evento"},{"data":"2026-05-12","titulo":"Semana da Engenharia (tarde)","tipo":"evento"},{"data":"2026-05-13","titulo":"Semana da Engenharia (tarde)","tipo":"evento"},{"data":"2026-05-14","titulo":"Semana da Engenharia (tarde)","tipo":"evento"},{"data":"2026-05-15","titulo":"Semana da Engenharia (tarde)","tipo":"evento"},{"data":"2026-09-14","titulo":"ENCITA*","tipo":"evento"},{"data":"2026-10-15","titulo":"Prêmio Weis*","tipo":"evento"},{"data":"2026-08-10","titulo":"2º Fund - Inspeção Saúde (manhã)","tipo":"cporaer"},{"data":"2026-09-04","titulo":"1º, 2º e 3º Prof - Treinam. formatura militar","tipo":"cporaer"},{"data":"2026-09-17","titulo":"3º Prof - Prática de tiro","tipo":"cporaer"},{"data":"2026-10-22","titulo":"Fund e Prof - Treinam. formatura militar","tipo":"cporaer"},{"data":"2026-11-06","titulo":"1º Fund e opt 2º Fund - Declar. Asp. (manhã)","tipo":"cporaer"},{"data":"2026-12-17","titulo":"3º Prof - Nomeação 1º Ten (manhã)","tipo":"cporaer"},{"data":"2026-12-18","titulo":"Colação de Grau ITA","tipo":"colacao"},{"data":"2026-03-02","titulo":"Início 1º Período","tipo":"marco"},{"data":"2026-08-03","titulo":"Início 2º Período","tipo":"marco"}];
+
+/* ================= configuração do Supabase =================
+   Preencha com os dados do SEU projeto (Project Settings > API).
+   É normal e seguro essas duas strings ficarem visíveis no código-fonte —
+   quem protege os dados são as RLS policies do schema.sql, nunca a chave. */
+const SUPABASE_URL = 'https://lebieehkkeaugoilalvq.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlYmllZWhra2VhdWdvaWxhbHZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMxOTQyOTgsImV4cCI6MjEwODc3MDI5OH0.Xt8Y9sPLMwS8MMpcnLlcoGzfuxxBcKui3cLoHgSCPtE';
+const SUPABASE_CONFIGURADO = !SUPABASE_URL.startsWith('COLE_AQUI');
+const sb = SUPABASE_CONFIGURADO ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+if(!SUPABASE_CONFIGURADO){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.querySelector('.login-caixa').innerHTML =
+      '<h1>Configuração pendente</h1><p>Edite o <code>index.html</code> e cole a URL e a chave anon do seu projeto Supabase nas constantes SUPABASE_URL / SUPABASE_ANON_KEY (veja o SETUP.md).</p>';
+  });
+}
+
+/* Departamentos e frentes — só pra rótulo/cor na UI; a fonte de verdade de
+   quem está em qual time vive nas tabelas `times`/`perfis` do Supabase. */
+const DEPTOS_INFO = {
+  des:{sigla:'DES', nome:'Desenvolvimento'}, ens:{sigla:'ENS', nome:'Ensino'}, rh:{sigla:'RH', nome:'Recursos Humanos'},
+  mkt:{sigla:'MKT', nome:'Marketing'}, cap:{sigla:'CAP', nome:'Captação'}, fin:{sigla:'FIN', nome:'Financeiro'}, ges:{sigla:'GES', nome:'Gestão'},
+};
+const FRENTES_INFO = {vest:'VEST', inho:'INHO', ext:'EXT'};
+const DEPT_VAR = {des:'--dept-des', ens:'--dept-ens', rh:'--dept-rh', mkt:'--dept-mkt', cap:'--dept-cap', fin:'--dept-fin', ges:'--dept-ges'};
+const DEPT_TINT_VAR = {des:'--dept-des-tint', ens:'--dept-ens-tint', rh:'--dept-rh-tint', mkt:'--dept-mkt-tint', cap:'--dept-cap-tint', fin:'--dept-fin-tint', ges:'--dept-ges-tint'};
+function corDepto(deptoId){ return DEPT_VAR[deptoId] || '--text-faint'; }
+
+/* Tarefas são linhas da tabela `eventos` com tipo='tarefa' — vêm junto no
+   mesmo carregamento dos eventos (ver carregarEventos()). */
+function todasTarefas(){
+  return eventosCasd.filter(e=> e.tipo==='tarefa').map(t=>{
+    const deptoId = t.time ? t.time.departamento_id : null;
+    return {
+      id:t.id, data:t.data,
+      tarefa:t.titulo,
+      status:t.status || 'pendente',
+      depto: deptoId,
+      siglaDepto: deptoId ? (DEPTOS_INFO[deptoId]||{}).sigla : '',
+      frente: t.time ? FRENTES_INFO[t.time.frente_id] : null,
+      membro: (t.responsavel && t.responsavel.nome_exibicao) || (t.dono && t.dono.nome_exibicao) || '—',
+      timeId: t.time_id,
+    };
+  });
+}
+function tarefasNoDia(dataIso){ return todasTarefas().filter(t=> t.data===dataIso && visivelParaMim(t.timeId)); }
+
+const HOJE = '2026-09-18';
+const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DOW_PT = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+const DOW_KEY = ['seg','ter','qua','qui','sex','sab','dom'];
+
+/* ================= horário padrão de aula (modelo, não data real) =================
+   4 turmas fixas; Extensivo (T1, T2, T4) tem 5 aulas de 50min a partir das 18h,
+   Semiextensivo (T3) para na 4ª aula. Sábado é outro turno: 3 blocos de 1h30 a
+   partir das 8h. É só um MODELO padrão, editável em texto livre — cada equipe
+   ajusta matéria/pessoa conforme o planejamento real da semana. */
+const TURMAS = ['t1','t2','t3','t4'];
+const TURMA_LABEL = {t1:'T1', t2:'T2', t3:'T3', t4:'T4'};
+const DIAS_HORARIO = [
+  {key:'seg', label:'Segunda'}, {key:'ter', label:'Terça'}, {key:'qua', label:'Quarta'},
+  {key:'qui', label:'Quinta'}, {key:'sex', label:'Sexta'}, {key:'sab', label:'Sábado'},
+];
+function slotsDoDia(diaKey, turma){
+  if(diaKey === 'sab'){
+    return [
+      {idx:1, ini:'08:00', fim:'09:30'},
+      {idx:2, ini:'09:50', fim:'11:20'},
+      {idx:3, ini:'11:30', fim:'13:00'},
+    ];
+  }
+  const base = [
+    {idx:1, ini:'18:00', fim:'18:50'},
+    {idx:2, ini:'18:50', fim:'19:40'},
+    {idx:3, ini:'19:40', fim:'20:30'},
+    {idx:4, ini:'20:50', fim:'21:40'},
+  ];
+  if(turma !== 't3') base.push({idx:5, ini:'21:40', fim:'22:30'});
+  return base;
+}
+function maxSlots(diaKey){ return diaKey==='sab' ? 3 : 5; }
+
+const CAT_LABEL = {marco:'Marco', prova:'Prova externa', institucional:'Institucional', destaque:'Destaque', geral:'Geral'};
+const CAT_VAR = {marco:'--cat-marco', prova:'--cat-prova', institucional:'--cat-institucional', destaque:'--cat-destaque', geral:'--cat-geral'};
+
+const FASE_LABEL = {aulas:'Aulas normais no ITA', semaninha:'Semaninha do ITA', exames:'Semana de exames do ITA', recesso:'Recesso do ITA — livre', fora:'Fora do período letivo — livre'};
+
+const ITA_EVENTOS_TIPO_LABEL = {feriado:'Feriado', evento:'Evento', cporaer:'CPORAER-SJ', colacao:'Colação', marco:'Marco'};
+
+/* ================= estado ================= */
+let eventosCasd = [];   // linhas da tabela `eventos` (tipo evento ou tarefa) que o RLS deixou eu ver
+let flagsDia = {};      // {data: 'vermelho'|'verde'|'amarelo'}
+let horarioMap = {};    // {'seg-t1': {aulas:{'1':{materia,pessoa}, ...}}, ...}
+let dbPronto = false;
+let usuarioAuth = null;     // auth.users do Supabase (sessão)
+let meuPerfil = null;       // linha de `perfis` do usuário logado
+let TIMES = [];              // catálogo de times (frente×depto) carregado do Supabase
+let PERFIS_TODOS = [];       // catálogo de perfis (pra popular o seletor de responsável)
+let filtrosOcultos = new Set(); // ids de `times` que EU escolhi não ver (filtros_usuario)
+
+function visivelParaMim(timeId){ return !timeId || !filtrosOcultos.has(timeId); }
+let arrastandoId = null;
+let zoomMes = null;             // null = visão do ano inteiro | 1..12 = mês em foco
+let ferramentaPintura = null;   // null | 'vermelho' | 'verde' | 'amarelo' | 'limpar'
+let pintando = false;
+let cellsPintadasNestaPassada = new Set();
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+function isoDate(y,m,d){ return `${y}-${pad2(m)}-${pad2(d)}`; }
+function diasNoMes(y,m){ return new Date(y, m, 0).getDate(); }
+function diaSemanaSeg0(y,m,d){ const w = new Date(y, m-1, d).getDay(); return (w+6)%7; }
+
+function getSemanaIta(dataIso){
+  for(const s of ITA_SEMANAS){ if(dataIso >= s.inicio && dataIso <= s.fim) return s; }
+  return null;
+}
+function eventosNoDia(dataIso){ return eventosCasd.filter(e=> e.data===dataIso && e.tipo==='evento' && visivelParaMim(e.time_id)); }
+function ehFeriado(dataIso){ return ITA_EVENTOS.some(e=> e.data===dataIso && e.tipo==='feriado'); }
+
+/* Motivos pelos quais uma data é um "ponto de atenção" pro ITA — feriado
+   nacional, semana de exames, semaninha (muita gente do ITA volta pra casa)
+   ou 7ª/8ª semana do bloco (reta final antes da semaninha/exames, cronograma
+   mais apertado). Usado tanto pra colorir o dia quanto pra filtrar conflitos. */
+function motivosAtencao(dataIso){
+  const motivos = [];
+  const semana = getSemanaIta(dataIso);
+  if(ehFeriado(dataIso)) motivos.push('feriado');
+  if(semana){
+    if(semana.fase==='exames') motivos.push('exames');
+    if(semana.fase==='semaninha') motivos.push('semaninha');
+    if(semana.atencao) motivos.push('atencao');
+  }
+  return motivos;
+}
+const MOTIVO_LABEL = {feriado:'feriado nacional do ITA', exames:'semana de exames do ITA', semaninha:'semaninha do ITA', atencao:'reta final do bloco (semana 7/8)'};
+
+/* ================= renderização: faixa do ano ================= */
+function renderFaixaAno(){
+  const wrap = document.getElementById('ano-strip');
+  wrap.innerHTML = '';
+  let mesAtual = null;
+  ITA_SEMANAS.forEach((s, i)=>{
+    const cel = document.createElement('div');
+    cel.className = `semana-cel fase-${s.fase}`;
+    if(s.atencao) cel.classList.add('atencao');
+    const feriadosDaSemana = ITA_EVENTOS.filter(e=> e.tipo==='feriado' && e.data>=s.inicio && e.data<=s.fim);
+    if(feriadosDaSemana.length) cel.classList.add('feriado');
+    const hojeSemana = HOJE >= s.inicio && HOJE <= s.fim;
+    if(hojeSemana) cel.classList.add('hoje');
+    const rot = s.rotulo ? ` · sem. ${s.rotulo}` : '';
+    const feriadoTxt = feriadosDaSemana.length ? ` · feriado: ${feriadosDaSemana.map(f=>f.titulo).join(', ')}` : '';
+    cel.title = `${fmtDataCurta(s.inicio)} a ${fmtDataCurta(s.fim)} — ${FASE_LABEL[s.fase]}${rot}${feriadoTxt}`;
+    cel.addEventListener('click', ()=> irParaMes(Number(s.inicio.slice(5,7))));
+    const mesDaSemana = s.inicio.slice(0,7);
+    if(mesDaSemana !== mesAtual){
+      mesAtual = mesDaSemana;
+      const tick = document.createElement('span');
+      tick.className = 'mes-tick';
+      tick.style.left = (i / ITA_SEMANAS.length * 100) + '%';
+      tick.textContent = MESES_PT[Number(s.inicio.slice(5,7))-1].slice(0,3);
+      wrap.appendChild(tick);
+    }
+    wrap.appendChild(cel);
+  });
+}
+function fmtDataCurta(iso){ const [y,m,d] = iso.split('-'); return `${d}/${m}`; }
+function irParaMes(m){
+  const el = document.getElementById('mes-'+m);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+/* ================= conflitos e janelas ================= */
+function renderConflitosJanelas(){
+  const conflitos = eventosCasd
+    .filter(e=> e.data >= HOJE)
+    .map(e=> ({ev:e, motivos:motivosAtencao(e.data)}))
+    .filter(x=> x.motivos.length > 0)
+    .sort((a,b)=> a.ev.data<b.ev.data?-1:1)
+    .slice(0,10);
+
+  const elC = document.getElementById('lista-conflitos');
+  elC.innerHTML = conflitos.length ? conflitos.map(({ev,motivos})=>`
+    <div class="item-flag">
+      <span class="data mono">${fmtDataCurta(ev.data)}</span>
+      <span class="txt">${escHtml(ev.titulo)}</span>
+      <span class="sem">${motivos.map(m=>MOTIVO_LABEL[m]).join(' · ')}</span>
+    </div>`).join('') : '<p class="vazio">Nenhum evento futuro cai num ponto de atenção do ITA.</p>';
+
+  const proximos = [
+    ...eventosCasd.filter(e=> e.data >= HOJE && e.categoria !== 'geral')
+      .map(e=> ({data:e.data, titulo:e.titulo, tag:CAT_LABEL[e.categoria]||e.categoria})),
+    ...ITA_EVENTOS.filter(e=> e.tipo==='feriado' && e.data >= HOJE)
+      .map(e=> ({data:e.data, titulo:e.titulo, tag:'Feriado ITA'})),
+  ].sort((a,b)=> a.data<b.data?-1:1).slice(0,10);
+
+  const elP = document.getElementById('lista-proximos');
+  elP.innerHTML = proximos.length ? proximos.map(p=>`
+    <div class="item-flag">
+      <span class="data mono">${fmtDataCurta(p.data)}</span>
+      <span class="txt">${escHtml(p.titulo)}</span>
+      <span class="sem">${p.tag}</span>
+    </div>`).join('') : '<p class="vazio">Nada relevante cadastrado à frente.</p>';
+
+  renderHorizonteTarefas();
+}
+
+/* Até onde as tarefas planejadas de cada departamento se estendem — a data
+   da tarefa mais distante ainda pendente, e a mais distante no total. Dá
+   pra ver de relance se o planejamento só enxerga 2 semanas à frente ou já
+   cobre o mês inteiro. */
+function renderHorizonteTarefas(){
+  const el = document.getElementById('lista-horizonte');
+  if(!el) return;
+  const todas = todasTarefas().filter(t=> visivelParaMim(t.timeId));
+  const porDeptoMap = new Map();
+  todas.forEach(t=>{
+    if(!t.depto) return;
+    if(!porDeptoMap.has(t.depto)) porDeptoMap.set(t.depto, []);
+    porDeptoMap.get(t.depto).push(t);
+  });
+  const porDepto = [...porDeptoMap.entries()].map(([deptoId, tarefas])=>{
+    const pendentes = tarefas.filter(t=> t.status==='pendente');
+    const maisLonge = (pendentes.length?pendentes:tarefas).reduce((a,b)=> a.data>b.data?a:b, {data:null});
+    return {deptoId, maisLonge, nPendentes: pendentes.length};
+  }).filter(x=> x.maisLonge.data);
+
+  if(!porDepto.length){ el.innerHTML = '<p class="vazio">Sem tarefas de membros cadastradas.</p>'; return; }
+
+  el.innerHTML = porDepto.map(({deptoId,maisLonge,nPendentes})=>`
+    <div class="horizonte-linha">
+      <span class="chip-depto" style="background:var(${DEPT_TINT_VAR[deptoId]}); color:var(${DEPT_VAR[deptoId]})">${(DEPTOS_INFO[deptoId]||{}).sigla||deptoId}</span>
+      <span class="txt">vai até <span class="data mono">${fmtDataCurta(maisLonge.data)}</span> · ${nPendentes} pendente${nPendentes===1?'':'s'}</span>
+    </div>`).join('');
+}
+
+/* ================= grade de meses ================= */
+function renderGradeMeses(){
+  if(pintando) return; // não redesenha no meio de um arraste de marcação
+  const grade = document.getElementById('grade-meses');
+  const zoom = document.getElementById('mes-zoom');
+  if(zoomMes){
+    grade.hidden = true;
+    zoom.hidden = false;
+    renderMesZoom(zoomMes);
+    return;
+  }
+  zoom.hidden = true;
+  grade.hidden = false;
+  grade.innerHTML = '';
+  for(let m=1; m<=12; m++){
+    grade.appendChild(construirMes(2026, m));
+  }
+}
+
+function abrirZoomMes(mes){
+  zoomMes = mes;
+  ferramentaPintura = null;
+  renderGradeMeses();
+  document.getElementById('mes-zoom').scrollIntoView({behavior:'smooth', block:'start'});
+}
+function fecharZoomMes(){
+  zoomMes = null;
+  ferramentaPintura = null;
+  renderGradeMeses();
+}
+function mudarZoomMes(delta){
+  if(!zoomMes) return;
+  zoomMes = ((zoomMes - 1 + delta + 12) % 12) + 1;
+  ferramentaPintura = null;
+  renderGradeMeses();
+}
+
+function construirMes(ano, mes){
+  const box = document.createElement('div');
+  box.className = 'mes';
+  box.id = 'mes-'+mes;
+
+  const head = document.createElement('div');
+  head.className = 'mes-head';
+  head.innerHTML = `<button type="button" class="titulo-clicavel"><h3>${MESES_PT[mes-1]}</h3><span class="lupa">🔍</span></button><span class="ano">${ano}</span>`;
+  head.querySelector('.titulo-clicavel').addEventListener('click', ()=> abrirZoomMes(mes));
+  box.appendChild(head);
+
+  const table = document.createElement('table');
+  table.className = 'grade';
+  table.innerHTML = '<colgroup><col style="width:18px">' + DOW_PT.map(()=>'<col>').join('') + '</colgroup>';
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th title="Semana do ITA">Sem</th>' + DOW_PT.map(d=>`<th>${d}</th>`).join('') + '</tr>';
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  const totalDias = diasNoMes(ano, mes);
+  const primeiraCol = diaSemanaSeg0(ano, mes, 1);
+  let dia = 1;
+  let linhas = Math.ceil((totalDias + primeiraCol) / 7);
+  for(let li=0; li<linhas; li++){
+    const tr = document.createElement('tr');
+    tr.appendChild(construirCelulaSemana(ano, mes, li, primeiraCol));
+    for(let ci=0; ci<7; ci++){
+      const td = document.createElement('td');
+      const idx = li*7 + ci;
+      if(idx < primeiraCol || dia > totalDias){
+        const vazia = document.createElement('div');
+        vazia.className = 'dia vazio-cel';
+        td.appendChild(vazia);
+      } else {
+        td.appendChild(construirDia(ano, mes, dia));
+        dia++;
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  box.appendChild(table);
+  return box;
+}
+
+function dataDaCelula(ano, mes, li, ci, primeiraCol){
+  const offset = li*7 + ci - primeiraCol;
+  const d = new Date(ano, mes-1, 1 + offset);
+  return isoDate(d.getFullYear(), d.getMonth()+1, d.getDate());
+}
+
+function construirCelulaSemana(ano, mes, li, primeiraCol){
+  const td = document.createElement('td');
+  td.className = 'cel-semana';
+  const dataSegunda = dataDaCelula(ano, mes, li, 0, primeiraCol);
+  const semana = getSemanaIta(dataSegunda);
+  if(semana && semana.rotulo){
+    const rot = document.createElement('span');
+    const classeSemana = semana.rotulo==='7' ? ' semana-7' : semana.rotulo==='8' ? ' semana-8' : '';
+    rot.className = `rotulo-semana fase-${semana.fase}` + (semana.atencao ? ' atencao' : '') + classeSemana;
+    rot.textContent = semana.rotulo;
+    const obsAtencao = semana.rotulo==='7' ? ' · 7ª semana do bloco (começa a reta final)'
+      : semana.rotulo==='8' ? ' · 8ª semana do bloco (última antes da semaninha/exames — ponto crítico)' : '';
+    rot.title = `Semana ${semana.rotulo} do ITA — ${FASE_LABEL[semana.fase]}${obsAtencao}`;
+    td.appendChild(rot);
+  }
+  return td;
+}
+
+/* ================= zoom de um mês só ================= */
+function renderMesZoom(mes){
+  const ano = 2026;
+  const wrap = document.getElementById('mes-zoom');
+  wrap.innerHTML = '';
+
+  const cab = document.createElement('div');
+  cab.className = 'zoom-cabecalho';
+  cab.innerHTML = `
+    <div>
+      <button type="button" class="zoom-voltar">← Ver o ano todo</button>
+      <h2>
+        <button type="button" class="zoom-nav" data-delta="-1" title="Mês anterior" aria-label="Mês anterior">‹</button>
+        ${MESES_PT[mes-1]} <span class="mono" style="font-size:14px; color:var(--text-faint)">${ano}</span>
+        <button type="button" class="zoom-nav" data-delta="1" title="Próximo mês" aria-label="Próximo mês">›</button>
+      </h2>
+    </div>
+    <div class="zoom-toolbar">
+      <span class="rotulo-tb">Marcar arrastando:</span>
+      <button type="button" class="ferramenta-btn vermelho" data-cor="vermelho"><span class="sw" style="background:var(--crit)"></span>Conflito</button>
+      <button type="button" class="ferramenta-btn verde" data-cor="verde"><span class="sw" style="background:var(--good)"></span>Janela boa</button>
+      <button type="button" class="ferramenta-btn amarelo" data-cor="amarelo"><span class="sw" style="background:var(--warn)"></span>Atenção</button>
+      <button type="button" class="ferramenta-btn limpar" data-cor="limpar"><span class="sw" style="background:var(--text-faint)"></span>Apagar</button>
+    </div>
+  `;
+  wrap.appendChild(cab);
+  cab.querySelector('.zoom-voltar').addEventListener('click', fecharZoomMes);
+  cab.querySelectorAll('.zoom-nav').forEach(b=>{
+    b.addEventListener('click', ()=> mudarZoomMes(Number(b.dataset.delta)));
+  });
+  cab.querySelectorAll('.ferramenta-btn').forEach(b=>{
+    if(b.dataset.cor === ferramentaPintura) b.classList.add('ativa');
+    b.addEventListener('click', ()=> selecionarFerramenta(b.dataset.cor));
+  });
+
+  const dica = document.createElement('p');
+  dica.className = 'zoom-dica';
+  dica.textContent = ferramentaPintura
+    ? 'Ferramenta ativa: clique e arraste sobre os dias pra marcar vários de uma vez. Clique na ferramenta de novo pra desativar e voltar a abrir os dias normalmente.'
+    : 'Clique num dia pra ver/editar os detalhes. Escolha uma cor acima pra marcar vários dias arrastando.';
+  wrap.appendChild(dica);
+  if(ferramentaPintura) wrap.classList.add('zoom-pintura'); else wrap.classList.remove('zoom-pintura');
+
+  const table = document.createElement('table');
+  table.className = 'grade-zoom';
+  table.innerHTML = '<colgroup><col style="width:26px">' + DOW_PT.map(()=>'<col>').join('') + '</colgroup>';
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th></th>' + DOW_PT.map(d=>`<th>${d}</th>`).join('') + '</tr>';
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  const totalDias = diasNoMes(ano, mes);
+  const primeiraCol = diaSemanaSeg0(ano, mes, 1);
+  let dia = 1;
+  const linhas = Math.ceil((totalDias + primeiraCol) / 7);
+  for(let li=0; li<linhas; li++){
+    const tr = document.createElement('tr');
+    const tdSem = construirCelulaSemana(ano, mes, li, primeiraCol);
+    tdSem.className = 'cel-semana-zoom';
+    tr.appendChild(tdSem);
+    for(let ci=0; ci<7; ci++){
+      const td = document.createElement('td');
+      const idx = li*7 + ci;
+      if(idx < primeiraCol || dia > totalDias){
+        const vazia = document.createElement('div');
+        vazia.className = 'dia-zoom vazio-cel';
+        td.appendChild(vazia);
+      } else {
+        td.appendChild(construirDiaZoom(ano, mes, dia));
+        dia++;
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  const tableWrap = document.createElement('div');
+  tableWrap.style.overflowX = 'auto';
+  tableWrap.appendChild(table);
+  wrap.appendChild(tableWrap);
+}
+
+function construirDiaZoom(ano, mes, dia){
+  const dataIso = isoDate(ano, mes, dia);
+  const semana = getSemanaIta(dataIso);
+  const fase = semana ? semana.fase : 'fora';
+  const evs = eventosNoDia(dataIso);
+  const tarefas = tarefasNoDia(dataIso);
+  const flag = flagsDia[dataIso];
+
+  const el = document.createElement('div');
+  el.className = `dia-zoom fase-${fase}`;
+  if(semana && semana.atencao) el.classList.add('atencao');
+  if(semana && semana.rotulo==='8') el.classList.add('semana-8');
+  if(ehFeriado(dataIso)) el.classList.add('feriado');
+  if(dataIso === HOJE) el.classList.add('hoje');
+  if(flag) el.classList.add('flag-'+flag);
+  el.dataset.data = dataIso;
+
+  const num = document.createElement('span');
+  num.className = 'num-zoom mono';
+  num.textContent = dia;
+  el.appendChild(num);
+
+  const listaEv = document.createElement('div');
+  listaEv.className = 'lista-ev-zoom';
+  const todosItens = [
+    ...evs.map(ev=> ({titulo:ev.titulo, cor:`var(${CAT_VAR[ev.categoria]||CAT_VAR.geral})`})),
+    ...tarefas.map(t=> ({titulo:`[${t.siglaDepto}] ${t.tarefa}`, cor:`var(${corDepto(t.depto)})`})),
+  ];
+  todosItens.slice(0,3).forEach(item=>{
+    const linha = document.createElement('div');
+    linha.className = 'item-ev-zoom';
+    linha.innerHTML = `<span class="pt" style="background:${item.cor}"></span><span></span>`;
+    linha.querySelector('span:last-child').textContent = item.titulo;
+    listaEv.appendChild(linha);
+  });
+  el.appendChild(listaEv);
+  if(todosItens.length > 3){
+    const mais = document.createElement('span');
+    mais.className = 'mais-zoom';
+    mais.textContent = `+${todosItens.length-3} mais`;
+    el.appendChild(mais);
+  }
+
+  if(semana && semana.rotulo){
+    const badge = document.createElement('span');
+    const classeSemana = semana.rotulo==='7' ? ' semana-7' : semana.rotulo==='8' ? ' semana-8' : '';
+    badge.className = 'semana-badge' + classeSemana;
+    badge.textContent = semana.rotulo;
+    el.appendChild(badge);
+  }
+
+  el.addEventListener('mousedown', e=>{
+    if(ferramentaPintura){ e.preventDefault(); iniciarPintura(dataIso); }
+  });
+  el.addEventListener('mouseenter', ()=>{ if(pintando) pintarCelula(dataIso); });
+  el.addEventListener('touchstart', ()=>{ if(ferramentaPintura) iniciarPintura(dataIso); });
+  el.addEventListener('click', ()=>{
+    if(ferramentaPintura) return; // ferramenta ativa: mousedown já cuidou da marcação
+    abrirDia(dataIso);
+  });
+
+  return el;
+}
+
+function construirDia(ano, mes, dia){
+  const dataIso = isoDate(ano, mes, dia);
+  const semana = getSemanaIta(dataIso);
+  const fase = semana ? semana.fase : 'fora';
+  const evs = eventosNoDia(dataIso);
+  const flag = flagsDia[dataIso];
+
+  const el = document.createElement('div');
+  el.className = `dia fase-${fase}`;
+  if(semana && semana.atencao) el.classList.add('atencao');
+  if(semana && semana.rotulo==='8') el.classList.add('semana-8');
+  if(ehFeriado(dataIso)) el.classList.add('feriado');
+  if(dataIso === HOJE) el.classList.add('hoje');
+  if(flag) el.classList.add('flag-'+flag);
+  el.dataset.data = dataIso;
+
+  const num = document.createElement('span');
+  num.className = 'num mono';
+  num.textContent = dia;
+  el.appendChild(num);
+
+  if(evs.length){
+    const pontos = document.createElement('span');
+    pontos.className = 'pontos';
+    evs.slice(0,4).forEach(ev=>{
+      const p = document.createElement('span');
+      p.className = 'ponto';
+      p.style.background = `var(${CAT_VAR[ev.categoria]||CAT_VAR.geral})`;
+      p.title = ev.titulo + ' — arraste pra outro dia';
+      p.draggable = true;
+      p.dataset.eventoId = ev.id;
+      pontos.appendChild(p);
+    });
+    if(evs.length > 4){
+      const mais = document.createElement('span');
+      mais.className = 'ponto mais';
+      mais.textContent = '+'+(evs.length-4);
+      pontos.appendChild(mais);
+    }
+    el.appendChild(pontos);
+  }
+
+  const tarefas = tarefasNoDia(dataIso);
+  if(tarefas.length){
+    const pontosT = document.createElement('span');
+    pontosT.className = 'pontos';
+    tarefas.slice(0,4).forEach(t=>{
+      const p = document.createElement('span');
+      p.className = 'ponto-tarefa';
+      p.style.background = `var(${corDepto(t.depto)})`;
+      p.title = `[${t.siglaDepto}] ${t.membro}: ${t.tarefa}`;
+      pontosT.appendChild(p);
+    });
+    el.appendChild(pontosT);
+  }
+
+  el.addEventListener('click', ()=> abrirDia(dataIso));
+
+  // drop target (mover evento arrastado)
+  el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('drop-alvo'); });
+  el.addEventListener('dragleave', ()=> el.classList.remove('drop-alvo'));
+  el.addEventListener('drop', e=>{
+    e.preventDefault();
+    el.classList.remove('drop-alvo');
+    if(arrastandoId) moverEvento(arrastandoId, dataIso);
+  });
+
+  return el;
+}
+
+/* ================= painel de dia ================= */
+let overlayAtual = null;
+
+function abrirDia(dataIso){
+  fecharOverlay();
+  const semana = getSemanaIta(dataIso);
+  const fase = semana ? semana.fase : 'fora';
+  const evs = eventosNoDia(dataIso);
+  const itaEvs = ITA_EVENTOS.filter(e=> e.data === dataIso);
+  const flag = flagsDia[dataIso] || null;
+  const motivosExtra = motivosAtencao(dataIso).filter(m=> m==='atencao' || m==='feriado');
+
+  const fundo = document.createElement('div');
+  fundo.className = 'overlay-fundo';
+  fundo.addEventListener('click', e=>{ if(e.target===fundo) fecharOverlay(); });
+
+  const [y,m,d] = dataIso.split('-').map(Number);
+  const nomeDia = new Date(y,m-1,d).toLocaleDateString('pt-BR', {weekday:'long'});
+
+  const painel = document.createElement('div');
+  painel.className = 'overlay-painel';
+  painel.innerHTML = `
+    <div class="overlay-head">
+      <div>
+        <h2>${d} de ${MESES_PT[m-1]}</h2>
+        <p class="overlay-sub">${cap(nomeDia)} · ${y}</p>
+      </div>
+      <button class="fechar" aria-label="Fechar">✕</button>
+    </div>
+    <div class="ita-status ${fase}">
+      <span class="icone" style="background:currentColor"></span>
+      <span>${FASE_LABEL[fase]}${semana && semana.rotulo ? ' · semana '+semana.rotulo : ''}</span>
+    </div>
+    ${motivosExtra.length ? `<div class="ita-status atencao">
+      <span class="icone" style="background:currentColor"></span>
+      <span>Ponto de atenção: ${motivosExtra.map(m=>MOTIVO_LABEL[m]).join(' · ')}</span>
+    </div>` : ''}
+    ${itaEvs.length ? `<div class="ita-eventos-dia">${itaEvs.map(e=>`<div class="ie"><span class="tag">${ITA_EVENTOS_TIPO_LABEL[e.tipo]||e.tipo}</span><span>${escHtml(e.titulo)}</span></div>`).join('')}</div>` : ''}
+    <div class="flags-row" id="flags-row"></div>
+    <p class="section-title" style="margin-bottom:8px">Eventos do CASD</p>
+    <div class="lista-eventos-dia" id="lista-eventos-dia"></div>
+    <div id="tarefas-dia-wrap"></div>
+    <div id="horario-dia-wrap"></div>
+    <form class="form-add" id="form-add-evento">
+      <input type="text" placeholder="Novo evento ou tarefa neste dia…" id="input-novo-titulo" maxlength="140" required>
+      <button type="submit">Adicionar</button>
+    </form>
+    <div class="campos-evento">
+      <div class="linha-campos">
+        <select id="input-novo-tipo">
+          <option value="evento">Evento</option>
+          <option value="tarefa">Tarefa</option>
+        </select>
+        <select id="input-novo-visibilidade">
+          <option value="publico">Público (todo mundo vê)</option>
+          <option value="privado">Privado (só eu vejo)</option>
+        </select>
+        <select id="input-novo-time"><option value="">Sem time específico</option></select>
+      </div>
+    </div>
+  `;
+  fundo.appendChild(painel);
+  document.body.appendChild(fundo);
+  overlayAtual = {fundo, dataIso};
+
+  painel.querySelector('.fechar').addEventListener('click', fecharOverlay);
+
+  const flagsRow = painel.querySelector('#flags-row');
+  ['vermelho','verde','amarelo'].forEach(cor=>{
+    const b = document.createElement('button');
+    b.className = 'flag-btn '+cor + (flag===cor ? ' ativo' : '');
+    b.innerHTML = `<span class="sw" style="background:var(--${cor==='vermelho'?'crit':cor==='verde'?'good':'warn'})"></span>${cor==='vermelho'?'Conflito':cor==='verde'?'Janela boa':'Atenção'}`;
+    b.addEventListener('click', ()=> alternarFlag(dataIso, cor));
+    flagsRow.appendChild(b);
+  });
+
+  const seletorTime = painel.querySelector('#input-novo-time');
+  TIMES.forEach(t=>{
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = `${(DEPTOS_INFO[t.departamento_id]||{}).sigla||t.departamento_id}-${FRENTES_INFO[t.frente_id]||t.frente_id}`;
+    seletorTime.appendChild(opt);
+  });
+  if(meuPerfil && meuPerfil.time_principal_id) seletorTime.value = meuPerfil.time_principal_id;
+
+  renderListaEventosDia(dataIso);
+  renderTarefasDia(dataIso);
+  renderHorarioDia(dataIso);
+
+  painel.querySelector('#form-add-evento').addEventListener('submit', e=>{
+    e.preventDefault();
+    const input = painel.querySelector('#input-novo-titulo');
+    const titulo = input.value.trim();
+    if(!titulo) return;
+    const tipo = painel.querySelector('#input-novo-tipo').value;
+    const visibilidade = painel.querySelector('#input-novo-visibilidade').value;
+    const timeId = painel.querySelector('#input-novo-time').value || null;
+    criarEvento(dataIso, titulo, 'geral', {tipo, visibilidade, time_id:timeId});
+    input.value = '';
+  });
+}
+
+function renderListaEventosDia(dataIso){
+  if(!overlayAtual) return;
+  const lista = overlayAtual.fundo.querySelector('#lista-eventos-dia');
+  const evs = eventosNoDia(dataIso);
+  if(!evs.length){
+    lista.innerHTML = '<p class="sem-eventos">Nada marcado ainda neste dia.</p>';
+    return;
+  }
+  lista.innerHTML = '';
+  evs.forEach(ev=>{
+    const time = TIMES.find(t=> t.id === ev.time_id);
+    const timeTxt = time ? `${(DEPTOS_INFO[time.departamento_id]||{}).sigla||time.departamento_id}-${FRENTES_INFO[time.frente_id]||time.frente_id}` : '';
+    const card = document.createElement('div');
+    card.className = 'evento-card';
+    card.innerHTML = `
+      <div class="linha1">
+        <span class="cat-dot" style="background:var(${CAT_VAR[ev.categoria]||CAT_VAR.geral})"></span>
+        <textarea class="titulo-ev" rows="1">${escHtml(ev.titulo)}</textarea>
+      </div>
+      ${(timeTxt || ev.visibilidade==='privado') ? `<div style="margin:2px 0 6px">
+        ${timeTxt ? `<span class="chip-time" style="background:var(${DEPT_TINT_VAR[time.departamento_id]}); color:var(${DEPT_VAR[time.departamento_id]})">${timeTxt}</span>` : ''}
+        ${ev.visibilidade==='privado' ? '<span class="chip-privado">🔒 privado</span>' : ''}
+      </div>` : ''}
+      <div class="acoes">
+        <select>
+          ${Object.entries(CAT_LABEL).map(([k,v])=>`<option value="${k}" ${k===ev.categoria?'selected':''}>${v}</option>`).join('')}
+        </select>
+        <select class="sel-visibilidade">
+          <option value="publico" ${ev.visibilidade==='publico'?'selected':''}>Público</option>
+          <option value="privado" ${ev.visibilidade==='privado'?'selected':''}>Privado</option>
+        </select>
+        <button type="button" class="del">Excluir</button>
+      </div>
+    `;
+    const ta = card.querySelector('textarea');
+    ta.addEventListener('change', ()=> editarEvento(ev.id, {titulo: ta.value.trim() || ev.titulo}));
+    card.querySelector('select').addEventListener('change', e=> editarEvento(ev.id, {categoria: e.target.value}));
+    card.querySelector('.sel-visibilidade').addEventListener('change', e=> editarEvento(ev.id, {visibilidade: e.target.value}));
+    card.querySelector('.del').addEventListener('click', ()=>{ if(confirm('Excluir este evento?')) excluirEvento(ev.id); });
+    lista.appendChild(card);
+  });
+}
+
+function renderTarefasDia(dataIso){
+  if(!overlayAtual) return;
+  const wrap = overlayAtual.fundo.querySelector('#tarefas-dia-wrap');
+  const tarefas = tarefasNoDia(dataIso);
+  if(!tarefas.length){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<p class="section-title" style="margin:14px 0 8px">Tarefas de membros (Sistema-Calendário)</p>` +
+    tarefas.map(t=>`
+      <div class="tarefa-card">
+        <span class="cat-dot" style="background:var(${corDepto(t.depto)})"></span>
+        <div class="corpo">
+          <div class="titulo-t">${escHtml(t.tarefa)}</div>
+          <div class="meta-t">${t.siglaDepto} · ${escHtml(t.membro)} · ${t.status==='concluida'?'concluída':'pendente'}</div>
+        </div>
+      </div>`).join('');
+}
+
+function renderHorarioDia(dataIso){
+  if(!overlayAtual) return;
+  const wrap = overlayAtual.fundo.querySelector('#horario-dia-wrap');
+  const [y,m,d] = dataIso.split('-').map(Number);
+  const dowIdx = diaSemanaSeg0(y,m,d); // 0=seg .. 6=dom
+  const diaKey = DOW_KEY[dowIdx];
+  if(diaKey === 'dom'){ wrap.innerHTML = ''; return; }
+
+  const nSlots = maxSlots(diaKey);
+  let html = `<p class="section-title" style="margin:14px 0 8px">Horário do dia (modelo padrão — editável)</p>
+    <div style="overflow-x:auto">
+    <table class="horario"><thead><tr><th></th>${TURMAS.map(t=>`<th>${TURMA_LABEL[t]}</th>`).join('')}</tr></thead><tbody>`;
+  for(let idx=1; idx<=nSlots; idx++){
+    html += '<tr>';
+    // horário da linha: usa o primeiro turma que tiver esse slot pra achar ini/fim
+    const refSlots = slotsDoDia(diaKey, 't1');
+    const ref = refSlots.find(s=>s.idx===idx);
+    html += `<td class="slot-hora mono" style="white-space:nowrap; vertical-align:middle">${ref?ref.ini+'–'+ref.fim:''}</td>`;
+    TURMAS.forEach(turma=>{
+      const slots = slotsDoDia(diaKey, turma);
+      const s = slots.find(x=>x.idx===idx);
+      if(!s){ html += '<td><div class="slot-vazio">—</div></td>'; return; }
+      const docId = diaKey+'-'+turma;
+      const dados = (horarioMap[docId] && horarioMap[docId].aulas && horarioMap[docId].aulas[idx]) || {};
+      html += `<td><div class="slot-horario" data-dia="${diaKey}" data-turma="${turma}" data-idx="${idx}">
+        <input class="materia" placeholder="matéria" value="${escAttr(dados.materia||'')}">
+        <input class="pessoa" placeholder="quem" value="${escAttr(dados.pessoa||'')}">
+      </div></td>`;
+    });
+    html += '</tr>';
+  }
+  html += '</tbody></table></div>';
+  wrap.innerHTML = html;
+
+  wrap.querySelectorAll('.slot-horario').forEach(slotEl=>{
+    const {dia, turma, idx} = slotEl.dataset;
+    slotEl.querySelector('.materia').addEventListener('change', e=> salvarSlotHorario(dia, turma, idx, 'materia', e.target.value.trim()));
+    slotEl.querySelector('.pessoa').addEventListener('change', e=> salvarSlotHorario(dia, turma, idx, 'pessoa', e.target.value.trim()));
+  });
+}
+
+function fecharOverlay(){
+  if(overlayAtual){ overlayAtual.fundo.remove(); overlayAtual = null; }
+}
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+function escHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function escAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ================= db: leitura/escrita ================= */
+function mostrarToast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=> t.remove(), 2200);
+}
+
+function atualizarChipConexao(){
+  const dot = document.getElementById('dot-conexao');
+  const txt = document.getElementById('texto-conexao');
+  if(dbPronto){ dot.classList.add('on'); txt.textContent = 'sincronizado'; }
+  else { dot.classList.remove('on'); txt.textContent = 'conectando…'; }
+}
+
+function atualizarChipUsuario(){
+  const chip = document.getElementById('chip-usuario');
+  if(!meuPerfil){ chip.hidden = true; return; }
+  chip.hidden = false;
+  chip.innerHTML = `<span class="status-dot on"></span><span>${escHtml(meuPerfil.nome_exibicao)} · ${meuPerfil.cargo.toUpperCase()}</span>`;
+  chip.style.cursor = 'pointer';
+  chip.title = 'Clique pra sair';
+  chip.onclick = ()=> sb.auth.signOut();
+}
+
+function renderFiltroPainel(){
+  const el = document.getElementById('filtro-times');
+  if(!el) return;
+  el.innerHTML = TIMES.map(t=>{
+    const oculto = filtrosOcultos.has(t.id);
+    const label = `${(DEPTOS_INFO[t.departamento_id]||{}).sigla||t.departamento_id}-${FRENTES_INFO[t.frente_id]||t.frente_id}`;
+    return `<button type="button" class="filtro-chip${oculto?' oculto':''}" data-time="${t.id}">
+      <span class="sw" style="background:var(${DEPT_VAR[t.departamento_id]})"></span>${label}
+    </button>`;
+  }).join('');
+  el.querySelectorAll('.filtro-chip').forEach(b=>{
+    b.addEventListener('click', ()=> alternarFiltro(b.dataset.time));
+  });
+}
+
+function renderTudo(){
+  renderFaixaAno();
+  renderConflitosJanelas();
+  renderGradeMeses();
+  renderFiltroPainel();
+  if(overlayAtual) renderListaEventosDia(overlayAtual.dataIso);
+}
+
+async function criarEvento(dataIso, titulo, categoria, extra){
+  extra = extra || {};
+  categoria = categoria || 'geral';
+  if(!meuPerfil){ mostrarToast('Sem conexão — não foi possível salvar.'); return; }
+  const tipo = extra.tipo === 'tarefa' ? 'tarefa' : 'evento';
+  const payload = {
+    data: dataIso, titulo, categoria, tipo,
+    visibilidade: extra.visibilidade === 'privado' ? 'privado' : 'publico',
+    time_id: extra.time_id || null,
+    dono_id: meuPerfil.id,
+    responsavel_id: tipo === 'tarefa' ? meuPerfil.id : null,
+    status: tipo === 'tarefa' ? 'pendente' : null,
+  };
+  const {error} = await sb.from('eventos').insert(payload);
+  if(error) mostrarToast('Não deu pra salvar: ' + error.message);
+}
+async function editarEvento(id, campos){
+  const {error} = await sb.from('eventos').update(campos).eq('id', id);
+  if(error) mostrarToast('Não deu pra editar (verifique se você é o dono/diretor do time): ' + error.message);
+}
+async function excluirEvento(id){
+  const {error} = await sb.from('eventos').delete().eq('id', id);
+  if(error) mostrarToast('Não deu pra excluir: ' + error.message);
+}
+async function moverEvento(id, novaData){
+  await editarEvento(id, {data: novaData});
+  mostrarToast('Evento movido para '+fmtDataCurta(novaData));
+}
+async function definirFlag(dataIso, cor){
+  // cor=null limpa a marcação. Sempre DEFINE (não alterna) — é o que a
+  // pintura por arraste precisa (senão passar duas vezes pela mesma célula
+  // ligaria/desligaria sem querer).
+  if(cor){
+    const {error} = await sb.from('flags').upsert({data: dataIso, cor});
+    if(error) mostrarToast('Não deu pra marcar: ' + error.message);
+  } else {
+    const {error} = await sb.from('flags').delete().eq('data', dataIso);
+    if(error) mostrarToast('Não deu pra marcar: ' + error.message);
+  }
+}
+async function alternarFiltro(timeId){
+  if(filtrosOcultos.has(timeId)){
+    filtrosOcultos.delete(timeId);
+    await sb.from('filtros_usuario').delete().eq('usuario_id', meuPerfil.id).eq('time_id', timeId);
+  } else {
+    filtrosOcultos.add(timeId);
+    await sb.from('filtros_usuario').insert({usuario_id: meuPerfil.id, time_id: timeId});
+  }
+  renderTudo();
+}
+async function alternarFlag(dataIso, cor){
+  const atual = flagsDia[dataIso];
+  await definirFlag(dataIso, atual === cor ? null : cor);
+}
+
+/* ================= pintura por arraste (zoom de mês) ================= */
+function selecionarFerramenta(cor){
+  ferramentaPintura = (ferramentaPintura === cor) ? null : cor;
+  if(zoomMes) renderMesZoom(zoomMes);
+}
+function pintarCelula(dataIso){
+  if(!ferramentaPintura || cellsPintadasNestaPassada.has(dataIso)) return;
+  cellsPintadasNestaPassada.add(dataIso);
+  const cor = ferramentaPintura === 'limpar' ? null : ferramentaPintura;
+  // feedback visual otimista — não espera a confirmação do banco pra já mostrar
+  const el = document.querySelector(`.dia-zoom[data-data="${dataIso}"]`);
+  if(el){
+    el.classList.remove('flag-vermelho','flag-verde','flag-amarelo');
+    if(cor) el.classList.add('flag-'+cor);
+  }
+  flagsDia = {...flagsDia};
+  if(cor) flagsDia[dataIso] = cor; else delete flagsDia[dataIso];
+  definirFlag(dataIso, cor);
+}
+function iniciarPintura(dataIso){
+  if(!ferramentaPintura) return;
+  pintando = true;
+  cellsPintadasNestaPassada = new Set();
+  pintarCelula(dataIso);
+}
+function pararPintura(){
+  if(!pintando) return;
+  pintando = false;
+  if(zoomMes) renderMesZoom(zoomMes); // reconcilia com o estado real do banco
+}
+document.addEventListener('mouseup', pararPintura);
+document.addEventListener('touchend', pararPintura);
+
+async function salvarSlotHorario(diaKey, turma, idx, campo, valor){
+  const docId = diaKey+'-'+turma;
+  const atual = horarioMap[docId] || {aulas:{}};
+  const novasAulas = {...atual.aulas, [idx]: {...(atual.aulas[idx]||{}), [campo]: valor}};
+  const {error} = await sb.from('horario').upsert({doc_id: docId, aulas: novasAulas});
+  if(error) mostrarToast('Não deu pra salvar o horário: ' + error.message);
+}
+
+/* ================= autenticação e carregamento de dados ================= */
+async function garantirPerfil(user){
+  let {data: perfil} = await sb.from('perfis').select('*').eq('id', user.id).maybeSingle();
+  if(!perfil){
+    const nome = (user.user_metadata && user.user_metadata.full_name) || user.email || 'Sem nome';
+    const {data: novo, error} = await sb.from('perfis').insert({id: user.id, nome_exibicao: nome}).select().single();
+    if(error){ mostrarToast('Não deu pra criar seu perfil: ' + error.message); return null; }
+    perfil = novo;
+  }
+  return perfil;
+}
+
+async function carregarCatalogos(){
+  const {data: times} = await sb.from('times').select('*');
+  TIMES = times || [];
+  const {data: perfis} = await sb.from('perfis').select('*');
+  PERFIS_TODOS = perfis || [];
+}
+
+async function carregarFiltros(){
+  const {data} = await sb.from('filtros_usuario').select('time_id').eq('usuario_id', meuPerfil.id);
+  filtrosOcultos = new Set((data||[]).map(r=> r.time_id));
+}
+
+async function carregarEventos(){
+  const {data, error} = await sb.from('eventos')
+    .select('*, dono:perfis!eventos_dono_id_fkey(nome_exibicao), responsavel:perfis!eventos_responsavel_id_fkey(nome_exibicao), time:times(id,frente_id,departamento_id)')
+    .order('data');
+  if(error){ mostrarToast('Erro ao ler eventos: ' + error.message); return; }
+  eventosCasd = data || [];
+  dbPronto = true;
+  atualizarChipConexao();
+  renderTudo();
+}
+
+async function carregarFlags(){
+  const {data, error} = await sb.from('flags').select('*');
+  if(error){ mostrarToast('Erro ao ler marcações: ' + error.message); return; }
+  const novo = {};
+  (data||[]).forEach(row=> novo[row.data] = row.cor);
+  flagsDia = novo;
+  renderTudo();
+}
+
+async function carregarHorario(){
+  const {data, error} = await sb.from('horario').select('*');
+  if(error){ mostrarToast('Erro ao ler horários: ' + error.message); return; }
+  const novo = {};
+  (data||[]).forEach(row=> novo[row.doc_id] = {aulas: row.aulas || {}});
+  horarioMap = novo;
+  if(overlayAtual) renderHorarioDia(overlayAtual.dataIso);
+}
+
+function assinarRealtime(){
+  sb.channel('eventos-realtime')
+    .on('postgres_changes', {event:'*', schema:'public', table:'eventos'}, carregarEventos)
+    .subscribe();
+  sb.channel('flags-realtime')
+    .on('postgres_changes', {event:'*', schema:'public', table:'flags'}, carregarFlags)
+    .subscribe();
+  sb.channel('horario-realtime')
+    .on('postgres_changes', {event:'*', schema:'public', table:'horario'}, carregarHorario)
+    .subscribe();
+}
+
+async function iniciarApp(user){
+  usuarioAuth = user;
+  document.getElementById('login-fundo').hidden = true;
+  document.getElementById('app-conteudo').hidden = false;
+  meuPerfil = await garantirPerfil(user);
+  if(!meuPerfil) return;
+  atualizarChipUsuario();
+  await carregarCatalogos();
+  await carregarFiltros();
+  await Promise.all([carregarEventos(), carregarFlags(), carregarHorario()]);
+  assinarRealtime();
+}
+
+function mostrarLogin(){
+  usuarioAuth = null; meuPerfil = null;
+  document.getElementById('login-fundo').hidden = false;
+  document.getElementById('app-conteudo').hidden = true;
+}
+
+if(SUPABASE_CONFIGURADO){
+  document.getElementById('btn-login-google').addEventListener('click', ()=>{
+    sb.auth.signInWithOAuth({provider:'google', options:{redirectTo: window.location.href}});
+  });
+
+  sb.auth.onAuthStateChange((_event, session)=>{
+    if(session && session.user) iniciarApp(session.user);
+    else mostrarLogin();
+  });
+}
+
+/* ================= interações do topo ================= */
+document.getElementById('btn-hoje').addEventListener('click', ()=> irParaMes(Number(HOJE.slice(5,7))));
+document.getElementById('btn-novo').addEventListener('click', ()=> abrirDia(HOJE));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') fecharOverlay(); });
+
+/* ================= arrastar (delegação global, pontinhos criados nas células) ================= */
+document.addEventListener('dragstart', e=>{
+  const alvo = e.target.closest('[data-evento-id]');
+  if(!alvo) return;
+  arrastandoId = alvo.dataset.eventoId;
+  alvo.classList.add('arrastando');
+  if(e.dataTransfer){
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', arrastandoId);
+  }
+});
+document.addEventListener('dragend', e=>{
+  const alvo = e.target.closest('[data-evento-id]');
+  if(alvo) alvo.classList.remove('arrastando');
+  arrastandoId = null;
+});
+
+/* ================= boot ================= */
+renderFaixaAno();
+renderConflitosJanelas();
+renderGradeMeses();
+atualizarChipConexao();
+</script>
